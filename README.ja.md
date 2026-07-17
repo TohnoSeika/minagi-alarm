@@ -44,27 +44,49 @@
 
 ## 🖼 スクリーンショット
 
-![01: アラーム画面](screenshots/ja/JP-01.jpg)
+![](screenshots/ja/JP-01.jpg)
 
-![02: アラーム編集](screenshots/ja/JP-02.jpg)
+*01: アラーム画面*
 
-![03: タイマー画面](screenshots/ja/JP-03.jpg)
+![](screenshots/ja/JP-02.jpg)
 
-![04: 設定1](screenshots/ja/JP-04.jpg)
+*02: アラーム編集*
 
-![05: 設定2](screenshots/ja/JP-05.jpg)
+![](screenshots/ja/JP-03.jpg)
 
-![06: 設定3](screenshots/ja/JP-06.jpg)
+*03: タイマー画面*
 
-![07: 設定4](screenshots/ja/JP-07.jpg)
+![](screenshots/ja/JP-04.jpg)
 
-![08: 設定5](screenshots/ja/JP-08.jpg)
+*04: 設定1*
 
-![09: クロックモード画面](screenshots/ja/JP-09.jpg)
+![](screenshots/ja/JP-05.jpg)
 
-![10: クロックモード音楽プレイヤー](screenshots/ja/JP-10.jpg)
+*05: 設定2*
 
-![11: クロックモードヘルプ](screenshots/ja/JP-11.jpg)
+![](screenshots/ja/JP-06.jpg)
+
+*06: 設定3*
+
+![](screenshots/ja/JP-07.jpg)
+
+*07: 設定4*
+
+![](screenshots/ja/JP-08.jpg)
+
+*08: 設定5*
+
+![](screenshots/ja/JP-09.jpg)
+
+*09: クロックモード画面*
+
+![](screenshots/ja/JP-10.jpg)
+
+*10: クロックモード音楽プレイヤー*
+
+![](screenshots/ja/JP-11.jpg)
+
+*11: クロックモードヘルプ*
 
 ---
 
@@ -77,8 +99,6 @@
 ---
 
 ## 📋 更新履歴
-
-詳細は [CHANGELOG.md](./CHANGELOG.md) をご覧ください。
 
 ### v1.4.0
 1. Electron から Tauri アーキテクチャに移行。

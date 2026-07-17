@@ -44,27 +44,49 @@ Supports **Windows 10** and **Windows 11**.
 
 ## 🖼 Screenshots
 
-![01: Alarm UI](screenshots/en/EN-01.jpg)
+![](screenshots/en/EN-01.jpg)
 
-![02: Edit Alarm](screenshots/en/EN-02.jpg)
+*01: Alarm UI*
 
-![03: Timer UI](screenshots/en/EN-03.jpg)
+![](screenshots/en/EN-02.jpg)
 
-![04: Settings 1](screenshots/en/EN-04.jpg)
+*02: Edit Alarm*
 
-![05: Settings 2](screenshots/en/EN-05.jpg)
+![](screenshots/en/EN-03.jpg)
 
-![06: Settings 3](screenshots/en/EN-06.jpg)
+*03: Timer UI*
 
-![07: Settings 4](screenshots/en/EN-07.jpg)
+![](screenshots/en/EN-04.jpg)
 
-![08: Settings 5](screenshots/en/EN-08.jpg)
+*04: Settings 1*
 
-![09: Clock Mode UI](screenshots/en/EN-09.jpg)
+![](screenshots/en/EN-05.jpg)
 
-![10: Clock Mode Music Player](screenshots/en/EN-10.jpg)
+*05: Settings 2*
 
-![11: Clock Mode Help](screenshots/en/EN-11.jpg)
+![](screenshots/en/EN-06.jpg)
+
+*06: Settings 3*
+
+![](screenshots/en/EN-07.jpg)
+
+*07: Settings 4*
+
+![](screenshots/en/EN-08.jpg)
+
+*08: Settings 5*
+
+![](screenshots/en/EN-09.jpg)
+
+*09: Clock Mode UI*
+
+![](screenshots/en/EN-10.jpg)
+
+*10: Clock Mode Music Player*
+
+![](screenshots/en/EN-11.jpg)
+
+*11: Clock Mode Help*
 
 ---
 
@@ -77,8 +99,6 @@ Download the latest installer from the [Releases](https://github.com/TohnoSeika/
 ---
 
 ## 📋 Changelog
-
-See [CHANGELOG.md](./CHANGELOG.md) for full details.
 
 ### v1.4.0
 1. Migrated from Electron to Tauri architecture.
