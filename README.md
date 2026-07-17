@@ -43,9 +43,27 @@ Built with **Tauri v2** (React + Rust), lightweight, beautiful, and ready to use
 
 ## 🖼 Screenshots
 
-> Screenshots are coming soon… stay tuned ✨
+![Main UI](screenshots/en/EN-01.jpg)
 
-<!-- Touka will put the screenshots here once they're ready ♪ -->
+![Add Alarm](screenshots/en/EN-02.jpg)
+
+![Timer](screenshots/en/EN-03.jpg)
+
+![Clock Mode](screenshots/en/EN-04.jpg)
+
+![Sticky Notes](screenshots/en/EN-05.jpg)
+
+![Music Player](screenshots/en/EN-06.jpg)
+
+![Desktop Mode](screenshots/en/EN-07.jpg)
+
+![Settings — General](screenshots/en/EN-08.jpg)
+
+![Settings — Visual](screenshots/en/EN-09.jpg)
+
+![Settings — Other](screenshots/en/EN-10.jpg)
+
+![System Tray](screenshots/en/EN-11.jpg)
 
 ---
 

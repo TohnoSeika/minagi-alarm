@@ -43,9 +43,27 @@
 
 ## 🖼 截图
 
-> 截图仍在准备中…敬请期待 ✨
+![主界面](screenshots/zh/CN-01.jpg)
 
-<!-- 等桃华准备好截图之后会放在这里哦 ♪ -->
+![添加闹钟](screenshots/zh/CN-02.jpg)
+
+![倒计时](screenshots/zh/CN-03.jpg)
+
+![时钟模式](screenshots/zh/CN-04.jpg)
+
+![便利贴](screenshots/zh/CN-05.jpg)
+
+![背景音乐播放器](screenshots/zh/CN-06.jpg)
+
+![桌面模式](screenshots/zh/CN-07.jpg)
+
+![设置 - 常规](screenshots/zh/CN-08.jpg)
+
+![设置 - 视觉](screenshots/zh/CN-09.jpg)
+
+![设置 - 其他](screenshots/zh/CN-10.jpg)
+
+![系统托盘](screenshots/zh/CN-11.jpg)
 
 ---
 

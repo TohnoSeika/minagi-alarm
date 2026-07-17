@@ -43,9 +43,27 @@
 
 ## 🖼 スクリーンショット
 
-> スクリーンショットは準備中です…お楽しみに ✨
+![メイン画面](screenshots/ja/JP-01.jpg)
 
-<!-- 桃華が準備でき次第、ここにスクリーンショットを置きますね ♪ -->
+![アラーム追加](screenshots/ja/JP-02.jpg)
+
+![タイマー](screenshots/ja/JP-03.jpg)
+
+![クロックモード](screenshots/ja/JP-04.jpg)
+
+![付箋](screenshots/ja/JP-05.jpg)
+
+![ミュージックプレイヤー](screenshots/ja/JP-06.jpg)
+
+![デスクトップモード](screenshots/ja/JP-07.jpg)
+
+![設定 — 一般](screenshots/ja/JP-08.jpg)
+
+![設定 — ビジュアル](screenshots/ja/JP-09.jpg)
+
+![設定 — その他](screenshots/ja/JP-10.jpg)
+
+![システムトレイ](screenshots/ja/JP-11.jpg)
 
 ---
 

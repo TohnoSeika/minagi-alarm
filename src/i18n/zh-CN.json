@@ -1,0 +1,234 @@
+{
+  "app": {
+    "title": "Minagi Alarm"
+  },
+  "date": {
+    "format": "{{year}}年{{month}}月{{day}}日",
+    "weekdayPrefix": "",
+    "weekdays": ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"],
+    "enterClockMode": "双击进入时钟模式"
+  },
+  "sounds": {
+    "chime": "🎐 风铃",
+    "gentle": "🌸 温柔",
+    "bell": "⏰ 经典",
+    "birds": "🐦 晨曦",
+    "piano": "🎹 琴声"
+  },
+  "soundPicker": {
+    "preview": "试听",
+    "stop": "停止",
+    "import": "📂 导入自定义音频...",
+    "importing": "选择中...",
+    "deleteConfirm": "确定要删除这个提示音吗？",
+    "deleteCancel": "取消",
+    "deleteConfirmBtn": "确定删除"
+  },
+  "tray": {
+    "showWindow": "打开 Minagi Alarm",
+    "enterDesktopMode": "开关桌面模式",
+    "exitDesktopMode": "开关桌面模式",
+    "desktopMode": "桌面模式",
+    "quit": "退出软件"
+  },
+  "titlebar": {
+    "enterDesktopMode": "进入桌面模式",
+    "exitDesktopMode": "退出桌面模式",
+    "toggleDesktopMode": "开关桌面模式",
+    "minimize": "最小化",
+    "close": "关闭"
+  },
+  "tab": {
+    "alarm": "闹钟",
+    "timer": "倒计时",
+    "settings": "设置"
+  },
+  "clock": {
+    "stopMusic": "点击停止播放",
+    "help": [
+      "进入：鼠标双击界面上方时间进入时钟模式",
+      "时钟：拖曳移动位置，鼠标滚轮缩放，右键重置",
+      "音乐：双击时钟打开播放器，点击唱片音符进行随机播放",
+      "功能：鼠标移动到窗口顶端激活桌面模式、最小化、关闭功能",
+      "桌面：标题栏按钮或托盘菜单进入桌面模式，托盘菜单退出桌面模式",
+      "背景：鼠标在空白处滚轮调整背景透明度，双击背景图片退出时钟模式",
+      "便签：空白处右键新建最多5个便利贴，图钉上右键显示菜单，左键移动位置"
+    ],
+    "helpTitle": "时钟模式操作说明",
+    "stickyPlaceholder": "写点什么...\n限制 50 字内",
+    "stickyContextMenu": "右键查看更多操作"
+  },
+  "alarm": {
+    "add": "添加闹钟",
+    "emptyTitle": "还没有闹钟",
+    "emptyHint": "点击下方 + 按钮添加一个新闹钟吧",
+    "repeat": {
+      "once": "仅一次",
+      "daily": "每天",
+      "weekdays": "工作日",
+      "weekends": "周末",
+      "custom": "自定义"
+    },
+    "weekday": {
+      "sun": "日",
+      "mon": "一",
+      "tue": "二",
+      "wed": "三",
+      "thu": "四",
+      "fri": "五",
+      "sat": "六"
+    },
+    "editor": {
+      "label": "备注（可选）",
+      "labelPlaceholder": "限制30字符以内",
+      "timeLabel": "时间（24小时制）",
+      "sound": "提示音",
+      "repeat": "重复",
+      "save": "保存",
+      "cancel": "取消",
+      "delete": "删除闹钟",
+      "confirmDelete": "确认删除",
+      "title": "新建闹钟",
+      "editTitle": "编辑闹钟"
+    },
+    "alert": {
+      "dismiss": "关闭",
+      "snooze": "贪睡 5 分钟",
+      "title": "闹钟"
+    }
+  },
+  "timer": {
+    "title": "倒计时",
+    "start": "开始",
+    "pause": "暂停",
+    "paused": "已暂停",
+    "reset": "重置",
+    "restart": "重新设置",
+    "finished": "时间到啦",
+    "finishedLabel": "倒计时结束",
+    "notification": "倒计时已完成",
+    "custom": "双击自定义",
+    "customTitle": "自定义时间",
+    "confirm": "确定",
+    "clearHint": "清空备注",
+    "sound": "提示音",
+    "hour": "时",
+    "minute": "分",
+    "second": "秒",
+    "reminderPlaceholder": "添加提醒文字（可选）",
+    "reminderPlaceholderLong": "添加提醒文字（可选），限制30字符以内",
+    "presets": {
+      "1min": "1 分钟",
+      "3min": "3 分钟",
+      "5min": "5 分钟",
+      "10min": "10 分钟",
+      "15min": "15 分钟",
+      "30min": "30 分钟",
+      "1hour": "1 小时"
+    },
+    "alert": {
+      "dismiss": "关闭",
+      "title": "倒计时"
+    }
+  },
+  "settings": {
+    "sound": "🔔 全局提示音",
+    "soundDesc": "所有闹钟和倒计时共用",
+    "current": "当前",
+    "language": "软件语言 / Language / 言語",
+    "languageDesc": "切换界面显示语言，实时生效",
+    "visual": "🖼 界面视觉",
+    "theme": "🎨 主题颜色",
+    "themeDesc": "调整界面的主色调与鼠标特效颜色",
+    "themeColor": "主题颜色",
+    "sakuraColor": "鼠标特效",
+    "restoreDefault": "恢复默认",
+    "other": "⚙ 其他选项",
+    "startupPage": "软件启动后进入",
+    "startupAlarm": "闹钟",
+    "startupTimer": "倒计时",
+    "startupSettings": "设置",
+    "startupClock": "时钟模式",
+    "clockHelp": "进入时钟模式后显示 5 秒操作说明",
+    "viewClockHelp": "点击查看时钟模式操作说明",
+    "showSeconds": "显示读秒",
+    "autoLaunch": "开机自启",
+    "minimizeToTray": "最小化时隐藏到托盘",
+    "closeToTray": "关闭时隐藏到托盘",
+    "bgImage": {
+      "set": "已设置背景图",
+      "notSet": "未设置背景图",
+      "change": "更换背景图",
+      "select": "选择背景图",
+      "adjust": "🔍 调整背景图位置大小",
+      "default": "🌸 使用默认背景图",
+      "clear": "✕ 清除背景图",
+      "opacity": "背景图片透明度"
+    },
+    "opacity": "软件界面透明度",
+    "wallpaperOpacity": "桌面模式透明度",
+    "wallpaperHint": "拖拽滑块可实时预览，松手后恢复当前界面透明度",
+    "about": {
+      "developed": "Developed by",
+      "credit": "im minagi , im everywhere",
+      "freeware": "本软件为免费软件，不会收取任何费用",
+      "iconCredit": "软件图标与默认背景图借助 Stable Diffusion WebUI Forge 创作",
+      "fontCredit": "本软件内嵌 Quicksand 及 Noto Sans SC 字体，基于 SIL 开放字体许可证使用"
+    },
+    "soundPicker": {
+      "title": "🔔 选择提示音"
+    },
+    "languagePicker": {
+      "title": "选择语言 / Select Language / 言語を選択"
+    }
+  },
+  "music": {
+    "nowPlaying": "正在播放",
+    "notPlaying": "未播放",
+    "play": "播放",
+    "stop": "停止",
+    "shuffle": "随机播放",
+    "playlist": "播放列表",
+    "volume": "音量",
+    "backHint": "点击空白处返回 音乐将继续播放",
+    "helpTitle": "时钟模式操作说明",
+    "helpHint": "双击时钟打开播放器，点击唱片音符进行随机播放"
+  },
+  "snooze": {
+    "hint": "闹钟将在 %time% 后再次响起",
+    "cancel": "取消贪睡",
+    "cancelConfirm": "确定要取消推迟提醒吗？",
+    "confirmBtn": "确定取消",
+    "back": "返回"
+  },
+  "stickynote": {
+    "contextMenu": "右键查看更多操作",
+    "delete": "删除便签",
+    "deleteConfirm": "确定要删除这个便利贴吗？",
+    "deleteHint": "删除后便签内容将丢失",
+    "cancel": "取消",
+    "deleteMenu": "删除便利贴",
+    "confirmDeleteBtn": "确定删除",
+    "emptyPlaceholder": "(空白便利贴)",
+    "exportMd": "导出为 MD",
+    "noteTitle": "便利贴",
+    "emptyText": "(空白)",
+    "exportFooter": "从 Minagi Alarm 导出",
+    "exportPrefix": "便利贴"
+  },
+  "timeWheel": {
+    "hour": "时",
+    "minute": "分"
+  },
+  "preview": {
+    "opacity": "背景透明度",
+    "scale": "缩放",
+    "confirm": "确认",
+    "cancel": "取消",
+    "reset": "重置",
+    "scrollHint": "滚轮缩放",
+    "dragHint": "拖动移动",
+    "frameHint": "虚线=界面区域",
+    "keyHint": "Esc 取消 · Enter 确认"
+  }
+}
