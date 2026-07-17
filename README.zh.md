@@ -5,6 +5,7 @@
 一个精致、优雅的桌面闹钟应用——**闹钟、倒计时、全屏时钟、桌面模式**，一应俱全。
 
 基于 **Tauri v2** 构建，React + Rust，轻量、漂亮、开箱即用。
+软件支持 **Windows 10** 和 **Windows 11** 系统。
 
 ---
 
@@ -43,27 +44,27 @@
 
 ## 🖼 截图
 
-![主界面](screenshots/zh/CN-01.jpg)
+![01: 闹钟界面](screenshots/zh/CN-01.jpg)
 
-![添加闹钟](screenshots/zh/CN-02.jpg)
+![02: 编辑闹钟](screenshots/zh/CN-02.jpg)
 
-![倒计时](screenshots/zh/CN-03.jpg)
+![03: 倒计时界面](screenshots/zh/CN-03.jpg)
 
-![时钟模式](screenshots/zh/CN-04.jpg)
+![04: 设置界面1](screenshots/zh/CN-04.jpg)
 
-![便利贴](screenshots/zh/CN-05.jpg)
+![05: 设置界面2](screenshots/zh/CN-05.jpg)
 
-![背景音乐播放器](screenshots/zh/CN-06.jpg)
+![06: 设置界面3](screenshots/zh/CN-06.jpg)
 
-![桌面模式](screenshots/zh/CN-07.jpg)
+![07: 设置界面4](screenshots/zh/CN-07.jpg)
 
-![设置 - 常规](screenshots/zh/CN-08.jpg)
+![08: 设置界面5](screenshots/zh/CN-08.jpg)
 
-![设置 - 视觉](screenshots/zh/CN-09.jpg)
+![09: 时钟模式界面](screenshots/zh/CN-09.jpg)
 
-![设置 - 其他](screenshots/zh/CN-10.jpg)
+![10: 时钟模式音乐播放器](screenshots/zh/CN-10.jpg)
 
-![系统托盘](screenshots/zh/CN-11.jpg)
+![11: 时钟模式帮助文件](screenshots/zh/CN-11.jpg)
 
 ---
 

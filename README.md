@@ -5,6 +5,7 @@
 A refined, elegant desktop alarm clock—**Alarms, Timer, Clock Mode, Desktop Mode**—all in one.
 
 Built with **Tauri v2** (React + Rust), lightweight, beautiful, and ready to use.
+Supports **Windows 10** and **Windows 11**.
 
 ---
 
@@ -43,27 +44,27 @@ Built with **Tauri v2** (React + Rust), lightweight, beautiful, and ready to use
 
 ## 🖼 Screenshots
 
-![Main UI](screenshots/en/EN-01.jpg)
+![01: Alarm UI](screenshots/en/EN-01.jpg)
 
-![Add Alarm](screenshots/en/EN-02.jpg)
+![02: Edit Alarm](screenshots/en/EN-02.jpg)
 
-![Timer](screenshots/en/EN-03.jpg)
+![03: Timer UI](screenshots/en/EN-03.jpg)
 
-![Clock Mode](screenshots/en/EN-04.jpg)
+![04: Settings 1](screenshots/en/EN-04.jpg)
 
-![Sticky Notes](screenshots/en/EN-05.jpg)
+![05: Settings 2](screenshots/en/EN-05.jpg)
 
-![Music Player](screenshots/en/EN-06.jpg)
+![06: Settings 3](screenshots/en/EN-06.jpg)
 
-![Desktop Mode](screenshots/en/EN-07.jpg)
+![07: Settings 4](screenshots/en/EN-07.jpg)
 
-![Settings — General](screenshots/en/EN-08.jpg)
+![08: Settings 5](screenshots/en/EN-08.jpg)
 
-![Settings — Visual](screenshots/en/EN-09.jpg)
+![09: Clock Mode UI](screenshots/en/EN-09.jpg)
 
-![Settings — Other](screenshots/en/EN-10.jpg)
+![10: Clock Mode Music Player](screenshots/en/EN-10.jpg)
 
-![System Tray](screenshots/en/EN-11.jpg)
+![11: Clock Mode Help](screenshots/en/EN-11.jpg)
 
 ---
 

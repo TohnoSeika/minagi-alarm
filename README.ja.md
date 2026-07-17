@@ -5,6 +5,7 @@
 洗練されたエレガントなデスクトップ目覚まし時計——**アラーム、タイマー、クロックモード、デスクトップモード**——すべてをひとつに。
 
 **Tauri v2**（React + Rust）で構築、軽量で美しく、すぐに使えます。
+**Windows 10** および **Windows 11** に対応しています。
 
 ---
 
@@ -43,27 +44,27 @@
 
 ## 🖼 スクリーンショット
 
-![メイン画面](screenshots/ja/JP-01.jpg)
+![01: アラーム画面](screenshots/ja/JP-01.jpg)
 
-![アラーム追加](screenshots/ja/JP-02.jpg)
+![02: アラーム編集](screenshots/ja/JP-02.jpg)
 
-![タイマー](screenshots/ja/JP-03.jpg)
+![03: タイマー画面](screenshots/ja/JP-03.jpg)
 
-![クロックモード](screenshots/ja/JP-04.jpg)
+![04: 設定1](screenshots/ja/JP-04.jpg)
 
-![付箋](screenshots/ja/JP-05.jpg)
+![05: 設定2](screenshots/ja/JP-05.jpg)
 
-![ミュージックプレイヤー](screenshots/ja/JP-06.jpg)
+![06: 設定3](screenshots/ja/JP-06.jpg)
 
-![デスクトップモード](screenshots/ja/JP-07.jpg)
+![07: 設定4](screenshots/ja/JP-07.jpg)
 
-![設定 — 一般](screenshots/ja/JP-08.jpg)
+![08: 設定5](screenshots/ja/JP-08.jpg)
 
-![設定 — ビジュアル](screenshots/ja/JP-09.jpg)
+![09: クロックモード画面](screenshots/ja/JP-09.jpg)
 
-![設定 — その他](screenshots/ja/JP-10.jpg)
+![10: クロックモード音楽プレイヤー](screenshots/ja/JP-10.jpg)
 
-![システムトレイ](screenshots/ja/JP-11.jpg)
+![11: クロックモードヘルプ](screenshots/ja/JP-11.jpg)
 
 ---
 
