@@ -15,6 +15,7 @@ export interface ElectronAPI {
   imageRead: (filePath: string) => Promise<string | null>
   minimizeWindow: () => Promise<void>
   closeWindow: () => Promise<void>
+  exitApp: () => Promise<void>
   setOpacity: (opacity: number) => Promise<void>
   animateOpacity: (target: number, duration: number) => Promise<void>
   setAlwaysOnTop: (onTop: boolean) => Promise<void>

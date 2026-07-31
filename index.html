@@ -4,16 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Minagi Alarm</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet" />
   </head>
-  <body oncontextmenu="return false;">
+  <body>
     <div id="root"></div>
-    <script>
-      // 尽早阻止右键菜单 —— 比 React 加载还快
-      document.addEventListener('contextmenu', function(e) { e.preventDefault() }, { capture: true })
-      window.addEventListener('contextmenu', function(e) { e.preventDefault() })
-    </script>
+    <!-- 字体使用本地 @fontsource；右键菜单阻止已在 src/main.tsx 全局注册。
+         此页面不含任何内联脚本与外部网络请求。 -->
     <script type="module" src="./src/main.tsx"></script>
   </body>
 </html>

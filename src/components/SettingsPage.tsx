@@ -337,7 +337,7 @@ export default function SettingsPage({ customSounds, onImportSound, onRemoveSoun
         <div className="settings-about__title-row">
           <span className="settings-about__icon">✦</span>
           <span className="settings-about__title">Minagi Alarm</span>
-          <span className="settings-about__version">V1.4</span>
+          <span className="settings-about__version">V1.5</span>
         </div>
         <div className="settings-about__line">Developed by <a href="https://space.bilibili.com/14816" className="settings-about__link" target="_blank" rel="noreferrer">Tohno Seika</a></div>
         <div className="settings-about__line">im minagi , im everywhere</div>

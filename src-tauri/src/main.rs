@@ -392,6 +392,16 @@ fn log_error(message: String) -> Result<(), String> {
     Ok(())
 }
 
+// ─── 退出 ──────────────────────────────────────────────────────────
+
+/// 真正退出应用——「关闭时隐藏到托盘」关闭时，点 X 直接结束进程
+/// 只有 exit 能结束托盘常驻的进程，hide/minimize 都只是藏起来
+#[tauri::command]
+fn exit_app(app: tauri::AppHandle) -> Result<(), String> {
+    app.exit(0);
+    Ok(())
+}
+
 // ─── 应用入口 ──────────────────────────────────────────────────────
 
 fn main() {
@@ -452,6 +462,7 @@ fn main() {
             set_tray_menu_texts,
             set_window_opacity,
             log_error,
+            exit_app,
         ]);
 
     builder.run(tauri::generate_context!()).expect("error while running Minagi Alarm");

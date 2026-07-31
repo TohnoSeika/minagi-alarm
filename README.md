@@ -14,7 +14,7 @@ Supports **Windows 10** and **Windows 11**.
 - 🕐 **Alarms** — Supports multiple alarms with custom ringtones, custom notes, and different repeat schedules
 - ⏳ **Timer** — Preset and custom countdown durations, with custom ringtone and custom reminder text
 - 🎵 **Custom Ringtones** — Import `mp3 / wav / ogg / flac / m4a / aac`, plus built-in refined chimes
-- 🖼️ **Clock Mode** — Compact and elegant clock display, draggable & resizable. Supports multiple sticky notes with custom content. Built-in music player with imported music support and shuffle mode
+- 🖼️ **Clock Mode** — Compact and elegant clock display, draggable & resizable. Supports up to 5 sticky notes with custom content. Built-in music player with imported music support and shuffle mode
 - 🪟 **Desktop Mode** — Embeds the window into the desktop with mouse-through support. Right-click the tray icon to exit Desktop Mode
 - 🌐 **Multilingual** — Supports 简体中文 · 繁體中文 · English · 日本語 interface languages
 - 🎨 **Theme Colors** — Custom accent color with sakura blossom mouse-trail particle effects
@@ -35,7 +35,7 @@ Supports **Windows 10** and **Windows 11**.
 | 🖼️ **Background Image** | In Settings, pick a background image, adjust opacity, scale & offset |
 | 🌸 **Sakura Effect** | In Settings, enable the sakura effect, adjust count, color & opacity |
 | 🖥️ **Clock Mode** | Double-click the time display, or set the startup page to Clock Mode |
-| 📝 **Sticky Notes** | Right-click empty space in Clock Mode to add a note; drag to reposition / double-click to edit / right-click the pin to delete or export as Markdown |
+| 📝 **Sticky Notes** | Right-click empty space in Clock Mode to add a note (up to 5); drag to reposition / double-click to edit / right-click the pin to delete or export as Markdown |
 | 🎵 **Background Music** | Double-click the clock in Clock Mode to open the music player; supports shuffle mode |
 | 🪟 **Desktop Mode** | Click the button on the title bar or use the tray menu to enter Desktop Mode; right-click the tray icon to exit |
 | 🗣️ **Switch Language** | Select your language in Settings — supports 简体中文 · 繁體中文 · English · 日本語, applies immediately |
@@ -94,11 +94,15 @@ Supports **Windows 10** and **Windows 11**.
 
 Download the latest installer from the [Releases](https://github.com/TohnoSeika/minagi-alarm/releases) page.
 
-> 💡 Current version **v1.4.0**, ~6 MB installer. Windows build is an NSIS setup program.
+> 💡 Current version **v1.5.0**, ~6 MB installer. Windows build is an NSIS setup program.
 
 ---
 
 ## 📋 Changelog
+
+### v1.5.0
+1. Officially open-sourced (MIT License).
+2. Fixed potential software bugs.
 
 ### v1.4.0
 1. Migrated from Electron to Tauri architecture.
@@ -144,7 +148,7 @@ Parts of this project's code and UI design were created with AI assistance.
 
 ## 📜 License
 
-This project is **free software**, all rights reserved.
+Released under the [MIT License](./LICENSE).
 See [LICENSE](./LICENSE) · [LICENSE.zh](./LICENSE.zh) · [LICENSE.ja](./LICENSE.ja) for details.
 
 ---

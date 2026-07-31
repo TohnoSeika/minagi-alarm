@@ -4,6 +4,18 @@
 
 ---
 
+## [1.5.0] — 2026-08-01
+
+### 开源准备 ✨
+
+- **许可** 新增 MIT 许可证（LICENSE / LICENSE.zh / LICENSE.ja），替换原先模糊的版权表述
+- **[index.html]** 移除 Google Fonts 网络请求与内联脚本，应用彻底离线运行
+- **[tauri.conf.json]** 设置 CSP——生产环境严格禁用外部网络，开发环境保留 Vite 热更新
+- **[App.tsx / main.rs / tauri.ts]** 修复「关闭时隐藏到托盘」关闭时点 X 未退出问题；新增 `exit_app` 命令实现真正退出
+- **版本号** 1.4.0 → 1.5.0（package.json / Cargo.toml / tauri.conf.json）
+
+---
+
 ## [1.4.0] — 2026-07-13
 
 ### 07-13

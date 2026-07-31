@@ -1,4 +1,4 @@
-# Minagi Alarm — 打包脚本
+﻿# Minagi Alarm — 打包脚本
 # 桃华帮 Minagi 写的，以后打包就运行这个就好啦 ✨
 #
 # 用法：
@@ -34,10 +34,17 @@ $BuildMode = if ($Debug) { "" } else { "" }
 Write-Host "🔨 正在构建安装包（这需要几分钟哦）..." -ForegroundColor Yellow
 Write-Host ""
 
-try {
-    npm run tauri:build 2>&1 | ForEach-Object { Write-Host $_ }
-} catch {
-    Write-Host "❌ 构建失败: $_" -ForegroundColor Red
+# 构建时临时把 ErrorActionPreference 调回 Continue——
+# npm/tauri 的 stderr 日志在 Stop 模式下会被 PowerShell 5.1 误判成错误而中断
+# 成败改用 $LASTEXITCODE 判断，更可靠
+$savedEap = $ErrorActionPreference
+$ErrorActionPreference = 'Continue'
+npm run tauri:build 2>&1 | ForEach-Object { Write-Host $_ }
+$exitCode = $LASTEXITCODE
+$ErrorActionPreference = $savedEap
+
+if ($exitCode -ne 0) {
+    Write-Host "❌ 构建失败（退出码 $exitCode）" -ForegroundColor Red
     exit 1
 }
 

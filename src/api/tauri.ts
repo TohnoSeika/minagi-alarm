@@ -137,6 +137,9 @@ export const tauriAPI: ElectronAPI = {
 
   closeWindow: () => appWindow.hide(),
 
+  // 真正退出进程——只有 exit 能结束托盘常驻的应用
+  exitApp: () => invoke('exit_app'),
+
   setOpacity: async (opacity: number) => {
     const clamped = Math.max(0.2, Math.min(1, opacity))
     await invoke('set_window_opacity', { opacity: clamped }).catch(() => {})

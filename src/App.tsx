@@ -323,7 +323,7 @@ function App() {
   }, [settings.minimizeToTray])
 
   const handleCloseWithSetting = useCallback(() => {
-    settings.closeToTray ? window.electronAPI.closeWindow() : window.electronAPI.minimizeWindow()
+    settings.closeToTray ? window.electronAPI.closeWindow() : window.electronAPI.exitApp()
   }, [settings.closeToTray])
 
   const toggleWallpaperMode = useCallback(async () => {

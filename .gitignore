@@ -5,3 +5,6 @@ target/
 *.log
 .DS_Store
 Thumbs.db
+
+# Claude Code 个人配置，不要公开
+.claude/

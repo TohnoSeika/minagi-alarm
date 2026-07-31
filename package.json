@@ -1,6 +1,6 @@
 {
   "name": "minagi-alarm-tauri",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "⏰ Minagi Alarm — 桃华帮 Minagi 做的精致桌面闹钟（Tauri 版）",
   "type": "module",
   "scripts": {
