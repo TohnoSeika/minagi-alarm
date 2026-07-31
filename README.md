@@ -21,7 +21,7 @@ Supports **Windows 10** and **Windows 11**.
 - 🖼️ **Custom Backgrounds** — Custom background images with mouse parallax tracking
 - 🪟 **Window Opacity** — Independent transparency control for the software UI and Desktop Mode
 - 🖱️ **System Tray** — Tray resident support with right-click context menu shortcuts
-- 🚀 **Performance** — ~6 MB installer, built on Tauri v2 + Rust, instant startup
+- 🚀 **Performance** — ~20 MB installer, built on Tauri v2 + Rust, instant startup
 
 ---
 
@@ -94,7 +94,7 @@ Supports **Windows 10** and **Windows 11**.
 
 Download the latest installer from the [Releases](https://github.com/TohnoSeika/minagi-alarm/releases) page.
 
-> 💡 Current version **v1.5.0**, ~6 MB installer. Windows build is an NSIS setup program.
+> 💡 Current version **v1.5.0**, ~20 MB installer. Windows build is an NSIS setup program.
 
 ---
 
