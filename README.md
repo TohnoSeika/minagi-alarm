@@ -90,6 +90,14 @@ Supports **Windows 10** and **Windows 11**.
 
 ---
 
+## 🎬 Video
+
+Watch the introduction video on Bilibili: [Minagi Alarm 介绍视频](https://www.bilibili.com/video/BV1duGK6CEdB)
+
+> 💬 The video only has Chinese audio and subtitles.
+
+---
+
 ## 📦 Download
 
 Download the latest installer from the [Releases](https://github.com/TohnoSeika/minagi-alarm/releases) page.

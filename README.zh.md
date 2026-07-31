@@ -90,6 +90,14 @@
 
 ---
 
+## 🎬 介绍视频
+
+在 Bilibili 观看介绍视频：[Minagi Alarm 介绍视频](https://www.bilibili.com/video/BV1duGK6CEdB)
+
+> 💬 视频仅提供中文语音和字幕。
+
+---
+
 ## 📦 下载
 
 从 [Releases](https://github.com/TohnoSeika/minagi-alarm/releases) 页面下载最新版本的安装包即可。
