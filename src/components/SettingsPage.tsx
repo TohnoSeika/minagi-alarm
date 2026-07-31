@@ -3,7 +3,7 @@
  * 全局提示音、背景图片、透明度、托盘行为
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, type MouseEvent } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import SoundPicker from './SoundPicker'
@@ -58,6 +58,12 @@ export default function SettingsPage({ customSounds, onImportSound, onRemoveSoun
   const update = useCallback((patch: Partial<SettingsData>) => {
     onSettingsChange({ ...settings, ...patch })
   }, [settings, onSettingsChange])
+
+  // 用系统浏览器打开外部链接——Tauri 里 <a target="_blank"> 点不开，必须走这里
+  const openExternal = useCallback((url: string) => (e: MouseEvent) => {
+    e.preventDefault()
+    window.electronAPI.openExternal(url)
+  }, [])
 
   useEffect(() => {
     window.electronAPI.setOpacity(settings.opacity)
@@ -339,7 +345,7 @@ export default function SettingsPage({ customSounds, onImportSound, onRemoveSoun
           <span className="settings-about__title">Minagi Alarm</span>
           <span className="settings-about__version">V1.5</span>
         </div>
-        <div className="settings-about__line">Developed by <a href="https://space.bilibili.com/14816" className="settings-about__link" target="_blank" rel="noreferrer">Tohno Seika</a></div>
+        <div className="settings-about__line">Developed by <a href="https://space.bilibili.com/14816" className="settings-about__link" target="_blank" rel="noreferrer" onClick={openExternal('https://space.bilibili.com/14816')}>Tohno Seika</a><a href="https://github.com/TohnoSeika" className="settings-about__github" target="_blank" rel="noreferrer" title="GitHub" onClick={openExternal('https://github.com/TohnoSeika')}></a></div>
         <div className="settings-about__line">im minagi , im everywhere</div>
         <div className="settings-about__line">{t('settings.about.freeware')}</div>
         <div className="settings-about__line">{t('settings.about.iconCredit')}</div>

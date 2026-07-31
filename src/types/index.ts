@@ -16,6 +16,7 @@ export interface ElectronAPI {
   minimizeWindow: () => Promise<void>
   closeWindow: () => Promise<void>
   exitApp: () => Promise<void>
+  openExternal: (url: string) => Promise<void>
   setOpacity: (opacity: number) => Promise<void>
   animateOpacity: (target: number, duration: number) => Promise<void>
   setAlwaysOnTop: (onTop: boolean) => Promise<void>

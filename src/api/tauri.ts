@@ -140,6 +140,9 @@ export const tauriAPI: ElectronAPI = {
   // 真正退出进程——只有 exit 能结束托盘常驻的应用
   exitApp: () => invoke('exit_app'),
 
+  // 打开外部链接——B站/GitHub 用系统默认浏览器打开
+  openExternal: (url: string) => invoke('open_external', { url }),
+
   setOpacity: async (opacity: number) => {
     const clamped = Math.max(0.2, Math.min(1, opacity))
     await invoke('set_window_opacity', { opacity: clamped }).catch(() => {})

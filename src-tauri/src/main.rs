@@ -402,6 +402,15 @@ fn exit_app(app: tauri::AppHandle) -> Result<(), String> {
     Ok(())
 }
 
+// ─── 打开外部链接 ──────────────────────────────────────────────────
+
+/// 用系统默认浏览器打开外部链接——B 站、GitHub 等
+/// `<a target="_blank">` 在 Tauri 里点不开，必须走这里（和 VTF_Baker 一个写法）
+#[tauri::command]
+fn open_external(url: String) -> Result<(), String> {
+    open::that(&url).map_err(|e| format!("打开链接失败: {}", e))
+}
+
 // ─── 应用入口 ──────────────────────────────────────────────────────
 
 fn main() {
@@ -463,6 +472,7 @@ fn main() {
             set_window_opacity,
             log_error,
             exit_app,
+            open_external,
         ]);
 
     builder.run(tauri::generate_context!()).expect("error while running Minagi Alarm");
