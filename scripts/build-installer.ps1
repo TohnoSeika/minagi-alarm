@@ -30,8 +30,10 @@ if (Test-Path "dist") {
 }
 
 # 3. 构建安装包
-$BuildMode = if ($Debug) { "" } else { "" }
-Write-Host "🔨 正在构建安装包（这需要几分钟哦）..." -ForegroundColor Yellow
+# -Debug 走 debug 配置——不做 LTO / strip，快不少，装出来的包只留着自己测试用
+$BuildArgs = if ($Debug) { @("run", "tauri:build", "--", "--debug") } else { @("run", "tauri:build") }
+$ProfileDir = if ($Debug) { "debug" } else { "release" }
+Write-Host "🔨 正在构建安装包（$ProfileDir 配置，这需要几分钟哦）..." -ForegroundColor Yellow
 Write-Host ""
 
 # 构建时临时把 ErrorActionPreference 调回 Continue——
@@ -39,7 +41,7 @@ Write-Host ""
 # 成败改用 $LASTEXITCODE 判断，更可靠
 $savedEap = $ErrorActionPreference
 $ErrorActionPreference = 'Continue'
-npm run tauri:build 2>&1 | ForEach-Object { Write-Host $_ }
+npm @BuildArgs 2>&1 | ForEach-Object { Write-Host $_ }
 $exitCode = $LASTEXITCODE
 $ErrorActionPreference = $savedEap
 
@@ -50,7 +52,7 @@ if ($exitCode -ne 0) {
 
 # 4. 复制安装包到 dist 目录
 $InstallerName = "Minagi Alarm_${Version}_x64-setup.exe"
-$InstallerSource = "src-tauri\target\release\bundle\nsis\$InstallerName"
+$InstallerSource = "src-tauri\target\$ProfileDir\bundle\nsis\$InstallerName"
 
 if (Test-Path $InstallerSource) {
     if (-not (Test-Path "dist")) {

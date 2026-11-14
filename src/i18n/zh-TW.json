@@ -94,7 +94,8 @@
       "dismiss": "關閉",
       "snooze": "貪睡 5 分鐘",
       "title": "鬧鐘"
-    }
+    },
+    "notification": "鬧鐘時間到了"
   },
   "timer": {
     "title": "倒數計時",

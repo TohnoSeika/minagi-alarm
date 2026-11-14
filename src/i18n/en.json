@@ -94,7 +94,8 @@
       "dismiss": "Dismiss",
       "snooze": "Snooze 5 min",
       "title": "Alarm"
-    }
+    },
+    "notification": "Time's up"
   },
   "timer": {
     "title": "Timer",

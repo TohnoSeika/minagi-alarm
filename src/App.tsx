@@ -125,6 +125,12 @@ function App() {
     startupPageRef.current = settings.startupPage
   }, [settings.startupPage])
 
+  // 界面画好之后再让窗口露面——窗口在配置里是隐藏的，不然启动时会先闪一下白底
+  // 不走 setTimeout / rAF：窗口还藏着的时候浏览器会把它们节流，反而拖慢露脸
+  useEffect(() => {
+    invoke('show_window_when_ready').catch(() => {})
+  }, [])
+
   // 保持 ref 与 wallpaperMode 同步，供副效应闭包读取最新值
   useEffect(() => {
     wallpaperModeRef.current = wallpaperMode

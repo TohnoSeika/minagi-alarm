@@ -20,6 +20,8 @@ use tauri::tray::{TrayIcon, TrayIconBuilder, TrayIconEvent, MouseButton};
 // 全局托盘图标 + 桌面模式状态——在 setup 时存入，菜单点击时同步处理
 static TRAY_ICON: OnceLock<TrayIcon<tauri::Wry>> = OnceLock::new();
 static WALLPAPER_MODE: AtomicBool = AtomicBool::new(false);
+/// 这次是开机自启（--hidden）——窗口再怎么样都不该自己露脸
+static STARTED_HIDDEN: AtomicBool = AtomicBool::new(false);
 
 // ─── Store ──────────────────────────────────────────────────────────
 
@@ -222,43 +224,6 @@ fn set_window_opacity(window: tauri::Window, opacity: f64) -> Result<(), String>
     set_window_alpha(&window, clamped)
 }
 
-/// 重建托盘菜单（桌面模式切换时更新文字）
-fn rebuild_tray_menu(app: &tauri::AppHandle, wallpaper_enabled: bool) {
-    let wallpaper_text = if wallpaper_enabled { "退出桌面模式" } else { "进入桌面模式" };
-    let show_item = match MenuItemBuilder::with_id("show", "打开 Minagi Alarm").build(app) {
-        Ok(item) => item,
-        Err(e) => { eprintln!("[桃华] show_item build error: {:?}", e); return; }
-    };
-    let wallpaper_item = match MenuItemBuilder::with_id("wallpaper", wallpaper_text).build(app) {
-        Ok(item) => item,
-        Err(e) => { eprintln!("[桃华] wallpaper_item build error: {:?}", e); return; }
-    };
-    let quit_item = match MenuItemBuilder::with_id("quit", "退出软件").build(app) {
-        Ok(item) => item,
-        Err(e) => { eprintln!("[桃华] quit_item build error: {:?}", e); return; }
-    };
-
-    let menu = match MenuBuilder::new(app)
-        .item(&show_item)
-        .separator()
-        .item(&wallpaper_item)
-        .separator()
-        .item(&quit_item)
-        .build()
-    {
-        Ok(m) => m,
-        Err(e) => { eprintln!("[桃华] menu build error: {:?}", e); return; }
-    };
-
-    if let Some(tray) = TRAY_ICON.get() {
-        match tray.set_menu(Some(menu)) {
-            Ok(()) => {},
-            Err(e) => eprintln!("[桃华] set_menu ERROR: {:?}", e),
-        }
-    }
-}
-
-
 // ─── 桌面模式 ─────────────────────────────────────────────────────
 
 /// 直接调用 Win32 SetWindowPos 把窗口推到 z-order 最底端
@@ -378,10 +343,41 @@ fn set_tray_menu_texts(
 
 // ─── 系统托盘 ──────────────────────────────────────────────────────
 
+/// 系统界面的语言——托盘刚建好、前端还没来得及刷新时，先按它挑一份文字
+#[cfg(target_os = "windows")]
+fn system_language() -> &'static str {
+    use windows_sys::Win32::Globalization::GetUserDefaultUILanguage;
+
+    let lang_id = unsafe { GetUserDefaultUILanguage() };
+    match lang_id {
+        // 繁体：台湾 / 香港 / 澳门
+        0x0404 | 0x0c04 | 0x1404 => "zh-TW",
+        _ if lang_id & 0x3ff == 0x04 => "zh-CN",
+        _ if lang_id & 0x3ff == 0x11 => "ja",
+        _ => "en",
+    }
+}
+
+#[cfg(not(target_os = "windows"))]
+fn system_language() -> &'static str {
+    "en"
+}
+
+/// 托盘菜单的初始文字——和前端 tray.* 用同一套说法，前端启动后再刷新一次
+fn initial_tray_texts() -> (&'static str, &'static str, &'static str) {
+    match system_language() {
+        "zh-CN" => ("打开 Minagi Alarm", "桌面模式 ON/OFF", "退出软件"),
+        "zh-TW" => ("開啟 Minagi Alarm", "桌面模式 ON/OFF", "退出軟體"),
+        "ja" => ("Minagi Alarm を開く", "デスクトップモード ON/OFF", "終了"),
+        _ => ("Open Minagi Alarm", "Desktop Mode ON/OFF", "Quit"),
+    }
+}
+
 fn setup_tray(app: &tauri::App) -> Result<(), Box<dyn std::error::Error>> {
-    let show_item = MenuItemBuilder::with_id("show", "打开 Minagi Alarm").build(app)?;
-    let wallpaper_item = MenuItemBuilder::with_id("wallpaper", "桌面模式 ON/OFF").build(app)?;
-    let quit_item = MenuItemBuilder::with_id("quit", "退出软件").build(app)?;
+    let (show_text, wallpaper_text, quit_text) = initial_tray_texts();
+    let show_item = MenuItemBuilder::with_id("show", show_text).build(app)?;
+    let wallpaper_item = MenuItemBuilder::with_id("wallpaper", wallpaper_text).build(app)?;
+    let quit_item = MenuItemBuilder::with_id("quit", quit_text).build(app)?;
 
     let menu = MenuBuilder::new(app)
         .item(&show_item)
@@ -429,7 +425,7 @@ fn setup_tray(app: &tauri::App) -> Result<(), Box<dyn std::error::Error>> {
         })
         .build(app)?;
 
-    // 存储托盘图标到全局静态，供桌面模式切换时重建菜单
+    // 存到全局静态——切换语言时 set_tray_menu_texts 要从这里拿到它
     let _ = TRAY_ICON.set(tray);
 
     Ok(())
@@ -513,6 +509,42 @@ fn show_alert_notification(app: tauri::AppHandle, title: String, body: String) -
     }
 }
 
+// ─── 启动 ────────────────────────────────────────────────────────
+
+/// 前端画好了——现在可以把窗口露出来了
+/// 窗口在配置里是 visible: false，等这一声再 show，冷启动就不会先闪一下白底
+/// 开机自启（--hidden）时就算前端说了也不算，继续藏着
+#[tauri::command]
+fn show_window_when_ready(app: tauri::AppHandle) {
+    if STARTED_HIDDEN.load(Ordering::SeqCst) {
+        return;
+    }
+    if let Some(window) = app.get_webview_window("main") {
+        #[cfg(debug_assertions)]
+        eprintln!("[启动] 前端就绪，窗口显示");
+        let _ = window.show();
+        let _ = window.set_focus();
+    }
+}
+
+/// 兜底：前端要是没走到「画好了」（加载失败之类），过一会儿自己露面
+/// 不能让窗口永远藏着——那看起来就跟没启动一样
+fn spawn_show_fallback(app: tauri::AppHandle) {
+    // 等的时间给得宽一点——正常启动根本走不到这里，真走到了说明前端出了事
+    let delay = if cfg!(debug_assertions) { 8 } else { 15 };
+    std::thread::spawn(move || {
+        std::thread::sleep(std::time::Duration::from_secs(delay));
+        let Some(window) = app.get_webview_window("main") else {
+            return;
+        };
+        if !window.is_visible().unwrap_or(false) {
+            #[cfg(debug_assertions)]
+            eprintln!("[启动] 兜底显示（前端没来打招呼）");
+            let _ = window.show();
+        }
+    });
+}
+
 // ─── 应用入口 ──────────────────────────────────────────────────────
 
 fn main() {
@@ -531,10 +563,9 @@ fn main() {
         .setup(|app| {
             // 开机自启静默启动：如果带有 --hidden 参数，窗口保持隐藏
             let is_auto_launched = std::env::args().any(|a| a == "--hidden");
-            if is_auto_launched {
-                if let Some(window) = app.get_webview_window("main") {
-                    let _ = window.hide();
-                }
+            STARTED_HIDDEN.store(is_auto_launched, Ordering::SeqCst);
+            if !is_auto_launched {
+                spawn_show_fallback(app.handle().clone());
             }
 
             // 创建系统托盘
@@ -575,6 +606,7 @@ fn main() {
             exit_app,
             open_external,
             show_alert_notification,
+            show_window_when_ready,
         ]);
 
     builder.run(tauri::generate_context!()).expect("error while running Minagi Alarm");

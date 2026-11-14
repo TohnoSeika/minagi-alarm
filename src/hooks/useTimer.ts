@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import i18n from '../i18n'
 
 export interface TimerState {
   totalSeconds: number
@@ -38,9 +39,10 @@ export function useTimer() {
       // 发送系统通知——窗口隐藏到托盘时用户也能收到
       if (!notifiedRef.current) {
         notifiedRef.current = true
-        const msg = reminderRef.current || '倒计时已完成'
+        // 文案走 i18n——倒计时结束那一刻才取
+        const msg = reminderRef.current || i18n.t('timer.notification')
         window.electronAPI.showNotification(
-          '⏱ 倒计时结束',
+          `⏱ ${i18n.t('timer.finishedLabel')}`,
           msg,
         )
       }

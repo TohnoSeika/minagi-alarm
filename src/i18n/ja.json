@@ -94,7 +94,8 @@
       "dismiss": "閉じる",
       "snooze": "5分スヌーズ",
       "title": "アラーム"
-    }
+    },
+    "notification": "アラームの時間です"
   },
   "timer": {
     "title": "タイマー",

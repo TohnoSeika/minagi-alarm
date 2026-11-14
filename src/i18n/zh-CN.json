@@ -34,7 +34,6 @@
   "titlebar": {
     "enterDesktopMode": "进入桌面模式",
     "exitDesktopMode": "退出桌面模式",
-    "toggleDesktopMode": "开关桌面模式",
     "minimize": "最小化",
     "close": "关闭"
   },
@@ -95,7 +94,8 @@
       "dismiss": "关闭",
       "snooze": "贪睡 5 分钟",
       "title": "闹钟"
-    }
+    },
+    "notification": "闹钟时间到了"
   },
   "timer": {
     "title": "倒计时",

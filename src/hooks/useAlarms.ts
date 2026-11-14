@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import i18n from '../i18n'
 
 export interface Alarm {
   id: string
@@ -115,12 +116,13 @@ export function useAlarms() {
         alertedSet.current.add(key)
         setTriggeredAlarmId(alarm.id)
         snoozeAlarmIdRef.current = alarm.id
-        setAlertLabel(alarm.label || '闹钟')
+        // 文案走 i18n——闹钟响的那一刻才取，切了语言就是新的那条
+        setAlertLabel(alarm.label || i18n.t('alarm.alert.title'))
         setAlertActive(true)
         // 发送系统通知——窗口隐藏到托盘时用户也能收到
         window.electronAPI.showNotification(
           `⏰ ${alarm.time}`,
-          alarm.label || '闹钟时间到了',
+          alarm.label || i18n.t('alarm.notification'),
         )
 
         // 「仅一次」响过就关掉，不然 alertedSet 每天清空之后它明天还会再响
