@@ -102,11 +102,17 @@ Watch the introduction video on Bilibili: [Minagi Alarm 介绍视频](https://ww
 
 Download the latest installer from the [Releases](https://github.com/TohnoSeika/minagi-alarm/releases) page.
 
-> 💡 Current version **v1.5.0**, ~20 MB installer. Windows build is an NSIS setup program.
+> 💡 Current version **v1.6.0**, ~20 MB installer. Windows build is an NSIS setup program.
 
 ---
 
 ## 📋 Changelog
+
+### v1.6.0
+1. Clicking the alarm / countdown notification now brings the app window back.
+2. Background images are saved to disk instead of being embedded in the settings file.
+3. Performance and stability improvements (idle sakura effect, drag handling, background throttling).
+4. Fixed: one-time alarms now switch themselves off after ringing; startup no longer wipes saved alarms.
 
 ### v1.5.0
 1. Officially open-sourced (MIT License).

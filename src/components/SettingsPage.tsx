@@ -5,6 +5,7 @@
 
 import { useState, useEffect, useCallback, type MouseEvent } from 'react'
 import { createPortal } from 'react-dom'
+import { getVersion } from '@tauri-apps/api/app'
 import { useTranslation } from 'react-i18next'
 import SoundPicker from './SoundPicker'
 import { SoundOption } from '../hooks/useAudio'
@@ -54,6 +55,12 @@ export default function SettingsPage({ customSounds, onImportSound, onRemoveSoun
   const [showSound, setShowSound] = useState(false)
   const [showLanguage, setShowLanguage] = useState(false)
   const [showSettingsHelp, setShowSettingsHelp] = useState(false)
+
+  // 版本号向应用自己问——以后每次升级只改配置文件，这里就不会再落后一版啦
+  const [appVersion, setAppVersion] = useState('')
+  useEffect(() => {
+    getVersion().then(setAppVersion).catch(() => {})
+  }, [])
 
   const update = useCallback((patch: Partial<SettingsData>) => {
     onSettingsChange({ ...settings, ...patch })
@@ -343,7 +350,7 @@ export default function SettingsPage({ customSounds, onImportSound, onRemoveSoun
         <div className="settings-about__title-row">
           <span className="settings-about__icon">✦</span>
           <span className="settings-about__title">Minagi Alarm</span>
-          <span className="settings-about__version">V1.5</span>
+          {appVersion && <span className="settings-about__version">V{appVersion}</span>}
         </div>
         <div className="settings-about__line">Developed by <a href="https://space.bilibili.com/14816" className="settings-about__link" target="_blank" rel="noreferrer" onClick={openExternal('https://space.bilibili.com/14816')}>Tohno Seika</a><a href="https://github.com/TohnoSeika" className="settings-about__github" target="_blank" rel="noreferrer" title="GitHub" onClick={openExternal('https://github.com/TohnoSeika')}></a></div>
         <div className="settings-about__line">im minagi , im everywhere</div>
