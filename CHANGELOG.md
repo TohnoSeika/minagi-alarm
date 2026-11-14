@@ -35,6 +35,7 @@
 - **死代码** 删掉没人调用的 `rebuild_tray_menu`，编译时那条 warning 也没了
 - **打包脚本** `-Debug` 不再是摆设：真的按 debug 配置构建，安装包路径也跟着走 `target\debug`
 - **多语言键** 删掉 zh-CN 里没人用的 `titlebar.toggleDesktopMode`，四种语言表的键现在对得上了
+- **安装包** 覆盖安装时不再弹「卸载后再装 / 不卸载」那一页，直接原地覆盖旧版本——官方模板把这一步做成了可选页且默认卸载，这里换成了项目自己的 `src-tauri/nsis/installer.nsi`（来源 tauri-cli v2.11.4，升级 tauri 时记得同步）
 
 ### 版本号
 
