@@ -24,6 +24,8 @@ export default function ClockModeDisplay({ showSeconds, onClockContextMenu }: { 
   const [dragging, setDragging] = useState(false)
   const dragStart = useRef({ x: 0, y: 0, cx: 0, cy: 0 })
   const containerRef = useRef<HTMLDivElement>(null)
+  const configRef = useRef(config)
+  configRef.current = config
 
   // 加载已保存的配置
   useEffect(() => {
@@ -49,22 +51,22 @@ export default function ClockModeDisplay({ showSeconds, onClockContextMenu }: { 
     dragStart.current = { x: e.clientX, y: e.clientY, cx: config.x, cy: config.y }
   }, [config])
 
+  // 依赖里只留 dragging——config 每动一帧都会变，放进来就是每帧重装一次监听
   useEffect(() => {
     if (!dragging) return
     const handleMove = (e: MouseEvent) => {
       const dx = e.clientX - dragStart.current.x
       const dy = e.clientY - dragStart.current.y
-      const newConfig = {
-        ...config,
+      setConfig({
+        ...configRef.current,
         x: Math.max(5, Math.min(95, dragStart.current.cx + (dx / window.innerWidth) * 100)),
         y: Math.max(5, Math.min(90, dragStart.current.cy + (dy / window.innerHeight) * 100)),
-      }
-      setConfig(newConfig)
+      })
     }
     const handleUp = () => {
       setDragging(false)
       // 松手后保存
-      saveConfig(config)
+      saveConfig(configRef.current)
     }
     window.addEventListener('mousemove', handleMove)
     window.addEventListener('mouseup', handleUp)
@@ -72,7 +74,7 @@ export default function ClockModeDisplay({ showSeconds, onClockContextMenu }: { 
       window.removeEventListener('mousemove', handleMove)
       window.removeEventListener('mouseup', handleUp)
     }
-  }, [dragging, config, saveConfig])
+  }, [dragging, saveConfig])
 
   // 滚轮缩放
   const handleWheel = useCallback((e: React.WheelEvent) => {

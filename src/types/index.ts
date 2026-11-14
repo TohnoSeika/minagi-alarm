@@ -24,6 +24,10 @@ export interface ElectronAPI {
   setAutoLaunch: (enabled: boolean) => Promise<void>
   getAppIcon: () => Promise<string | null>
   saveFile: (defaultName: string, content: string) => Promise<boolean>
+  /** 背景图落盘：data URL → "file:路径" */
+  persistBackground: (image: string) => Promise<string>
+  /** 背景图还原："file:路径" → data URL */
+  restoreBackground: (stored: string) => Promise<string>
   onShowFromTray: (callback: () => void) => () => void
   onWallpaperModeChanged: (callback: (enabled: boolean) => void) => () => void
   onToggleWallpaperMode: (callback: () => void) => () => void
@@ -33,7 +37,5 @@ export interface ElectronAPI {
 declare global {
   interface Window {
     electronAPI: ElectronAPI
-    /** 透明度动画使用——记录当前窗口透明度 */
-    __savedOpacity: number
   }
 }

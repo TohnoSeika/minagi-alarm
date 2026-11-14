@@ -114,7 +114,6 @@ export default function SakuraEffect({ color, opacity: globalOpacity }: { color:
   const petalsRef = useRef<Petal[]>([])
   const mouseRef = useRef({ x: -200, y: -200, prevX: -200, prevY: -200 })
   const frameRef = useRef(0)
-  const tickRef = useRef(0)
   const petalColorsRef = useRef(buildPetalColors(color))
   const globalOpacityRef = useRef(globalOpacity)
 
@@ -132,6 +131,10 @@ export default function SakuraEffect({ color, opacity: globalOpacity }: { color:
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
+    // 循环只在「还有花瓣」或「鼠标刚动过」时跑——闲着的时候一帧都不画
+    let running = false
+    let mouseActive = false
+
     const resize = () => {
       canvas.width = window.innerWidth
       canvas.height = window.innerHeight
@@ -139,29 +142,19 @@ export default function SakuraEffect({ color, opacity: globalOpacity }: { color:
     resize()
     window.addEventListener('resize', resize)
 
-    const onMouseMove = (e: MouseEvent) => {
-      mouseRef.current.prevX = mouseRef.current.x
-      mouseRef.current.prevY = mouseRef.current.y
-      mouseRef.current.x = e.clientX
-      mouseRef.current.y = e.clientY
-    }
-    const onMouseLeave = () => {
-      // 鼠标离开窗口后把位置重置到窗外，花瓣就不会继续生成了
-      mouseRef.current.x = -200
-      mouseRef.current.y = -200
-    }
-    window.addEventListener('mousemove', onMouseMove)
-    document.addEventListener('mouseleave', onMouseLeave)
-
     const animate = () => {
+      if (petalsRef.current.length === 0 && !mouseActive) {
+        running = false
+        return
+      }
+      mouseActive = false
       frameRef.current = requestAnimationFrame(animate)
-      tickRef.current++
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
       const { x: mx, y: my } = mouseRef.current
 
       // 鼠标移动时生成花瓣（移动越快生成越多）
-      if (mx > 0 && my > 0 && tickRef.current % 1 === 0) {
+      if (mx > 0 && my > 0) {
         const dx = mx - mouseRef.current.prevX
         const dy = my - mouseRef.current.prevY
         const speed = Math.sqrt(dx * dx + dy * dy)
@@ -225,9 +218,32 @@ export default function SakuraEffect({ color, opacity: globalOpacity }: { color:
       }
     }
 
-    animate()
+    const startLoop = () => {
+      if (running) return
+      running = true
+      frameRef.current = requestAnimationFrame(animate)
+    }
+
+    const onMouseMove = (e: MouseEvent) => {
+      mouseRef.current.prevX = mouseRef.current.x
+      mouseRef.current.prevY = mouseRef.current.y
+      mouseRef.current.x = e.clientX
+      mouseRef.current.y = e.clientY
+      mouseActive = true
+      startLoop()
+    }
+    const onMouseLeave = () => {
+      // 鼠标离开窗口后把位置重置到窗外，花瓣就不会继续生成了
+      mouseRef.current.x = -200
+      mouseRef.current.y = -200
+    }
+    window.addEventListener('mousemove', onMouseMove)
+    document.addEventListener('mouseleave', onMouseLeave)
+
+    startLoop()
 
     return () => {
+      running = false
       cancelAnimationFrame(frameRef.current)
       window.removeEventListener('mousemove', onMouseMove)
       window.removeEventListener('resize', resize)

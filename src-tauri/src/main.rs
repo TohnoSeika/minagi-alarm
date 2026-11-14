@@ -68,9 +68,10 @@ fn set_store(app: tauri::AppHandle, key: String, value: Value) -> Result<(), Str
 
 // ─── 文件读取 ───────────────────────────────────────────────────────
 
-#[tauri::command]
-fn read_file_as_data_url(path: String) -> Result<Option<String>, String> {
-    let data = fs::read(&path).map_err(|e| e.to_string())?;
+/// 把文件读成 data URL——音频、图片都用它
+/// 整份文件读完再 base64 会占不少内存，所以交给 async 命令去做，别堵 UI 线程
+fn file_as_data_url(path: &str) -> Result<String, String> {
+    let data = fs::read(path).map_err(|e| e.to_string())?;
     let ext = path.rsplit('.').next().unwrap_or("").to_lowercase();
     let mime = match ext.as_str() {
         "jpg" | "jpeg" => "image/jpeg",
@@ -87,24 +88,81 @@ fn read_file_as_data_url(path: String) -> Result<Option<String>, String> {
         _ => "application/octet-stream",
     };
     let b64 = base64::engine::general_purpose::STANDARD.encode(&data);
-    Ok(Some(format!("data:{};base64,{}", mime, b64)))
+    Ok(format!("data:{};base64,{}", mime, b64))
+}
+
+#[tauri::command]
+async fn read_file_as_data_url(path: String) -> Result<Option<String>, String> {
+    file_as_data_url(&path).map(Some)
+}
+
+// ─── 背景图落盘 ─────────────────────────────────────────────────────
+// 以前背景图是 base64 塞进设置 JSON 的，动一下滑块就要重写好几 MB。
+// 现在只在设置里留一个 "file:路径"，图片本体放 app data 目录 ✨
+
+/// 删掉 app data 里所有旧格式的背景图
+fn remove_background_files(dir: &std::path::Path) {
+    for ext in ["png", "gif", "webp", "bmp", "jpg"] {
+        let path = dir.join(format!("background.{}", ext));
+        if path.exists() {
+            let _ = fs::remove_file(path);
+        }
+    }
+}
+
+#[tauri::command]
+async fn save_background_image(app: tauri::AppHandle, data_url: String) -> Result<String, String> {
+    let (header, b64) = data_url.split_once(',').ok_or("无效的图片数据")?;
+    let ext = if header.contains("image/png") {
+        "png"
+    } else if header.contains("image/gif") {
+        "gif"
+    } else if header.contains("image/webp") {
+        "webp"
+    } else if header.contains("image/bmp") {
+        "bmp"
+    } else {
+        "jpg"
+    };
+
+    let bytes = base64::engine::general_purpose::STANDARD
+        .decode(b64)
+        .map_err(|e| e.to_string())?;
+
+    let dir = app.path().app_data_dir().map_err(|e| e.to_string())?;
+    fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
+
+    // 换图时把旧格式的也清掉，免得磁盘上堆一串没用的大图
+    remove_background_files(&dir);
+
+    let path = dir.join(format!("background.{}", ext));
+    fs::write(&path, bytes).map_err(|e| e.to_string())?;
+    Ok(path.to_string_lossy().to_string())
+}
+
+/// 清空背景图——把落盘的图片一起删掉，别留个用不上的文件
+#[tauri::command]
+async fn clear_background_image(app: tauri::AppHandle) -> Result<(), String> {
+    let dir = app.path().app_data_dir().map_err(|e| e.to_string())?;
+    remove_background_files(&dir);
+    Ok(())
 }
 
 // ─── 应用图标 ──────────────────────────────────────────────────────
 
 #[tauri::command]
-fn get_app_icon(app: tauri::AppHandle) -> Result<Option<String>, String> {
+async fn get_app_icon(app: tauri::AppHandle) -> Result<Option<String>, String> {
     if let Ok(resource_dir) = app.path().resource_dir() {
         let png_path = resource_dir.join("icons/icon.png");
         if png_path.exists() {
-            return read_file_as_data_url(png_path.to_string_lossy().to_string());
+            return file_as_data_url(&png_path.to_string_lossy()).map(Some);
         }
     }
     // 从项目目录查找
     let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let local_png = manifest_dir.join("icons/icon.png");
     if local_png.exists() {
-        return read_file_as_data_url(local_png.to_string_lossy().to_string());
+        return file_as_data_url(&local_png.to_string_lossy()).map(Some);
     }
     Ok(None)
 }
@@ -141,8 +199,9 @@ fn set_window_alpha(handle: &impl raw_window_handle::HasWindowHandle, opacity: f
     let alpha = (opacity * 255.0) as u8;
 
     unsafe {
-        // 设置 WS_EX_LAYERED 扩展样式
-        SetWindowLongW(hwnd, GWL_EXSTYLE, WS_EX_LAYERED as i32);
+        // 先读出来再按位或——直接覆盖会把窗口原有的扩展样式全抹掉
+        let style = GetWindowLongW(hwnd, GWL_EXSTYLE);
+        SetWindowLongW(hwnd, GWL_EXSTYLE, style | WS_EX_LAYERED as i32);
         // 设置透明度
         SetLayeredWindowAttributes(hwnd, 0, alpha, LWA_ALPHA);
     }
@@ -229,13 +288,15 @@ fn set_window_transparent(handle: &impl raw_window_handle::HasWindowHandle, tran
     let hwnd = get_hwnd(handle)?;
 
     unsafe {
-        if transparent {
-            // WS_EX_TRANSPARENT | WS_EX_LAYERED（WINDOW_LONG_PTR 是 isize）
-            SetWindowLongW(hwnd, GWL_EXSTYLE, (WS_EX_TRANSPARENT | WS_EX_LAYERED) as i32);
+        // 同样先读再改——只动自己要动的那几位，别把别的样式顺手清掉
+        let style = GetWindowLongW(hwnd, GWL_EXSTYLE);
+        let next = if transparent {
+            style | WS_EX_TRANSPARENT as i32 | WS_EX_LAYERED as i32
         } else {
-            // 恢复：仅保留 WS_EX_LAYERED（不清除透明层样式！）
-            SetWindowLongW(hwnd, GWL_EXSTYLE, WS_EX_LAYERED as i32);
-        }
+            // 恢复：只摘掉鼠标穿透，WS_EX_LAYERED 留着（透明度还要用）
+            style & !(WS_EX_TRANSPARENT as i32)
+        };
+        SetWindowLongW(hwnd, GWL_EXSTYLE, next);
     }
 
     Ok(())
@@ -344,11 +405,7 @@ fn setup_tray(app: &tauri::App) -> Result<(), Box<dyn std::error::Error>> {
             let id = event.id().as_ref();
             match id {
                 "show" => {
-                    if let Some(window) = app.get_webview_window("main") {
-                        let _ = window.show();
-                        let _ = window.set_focus();
-                        let _ = app.emit("show-from-tray", ());
-                    }
+                    reveal_main_window(app);
                 }
                 "wallpaper" => {
                     // 同步处理——像 Electron 版一样直接切换，不走前端 IPC
@@ -367,12 +424,7 @@ fn setup_tray(app: &tauri::App) -> Result<(), Box<dyn std::error::Error>> {
                 ..
             } = event
             {
-                let app = tray.app_handle();
-                if let Some(window) = app.get_webview_window("main") {
-                    let _ = window.show();
-                    let _ = window.set_focus();
-                    let _ = app.emit("show-from-tray", ());
-                }
+                reveal_main_window(tray.app_handle());
             }
         })
         .build(app)?;
@@ -411,6 +463,56 @@ fn open_external(url: String) -> Result<(), String> {
     open::that(&url).map_err(|e| format!("打开链接失败: {}", e))
 }
 
+// ─── 系统通知 ──────────────────────────────────────────────────────
+
+/// 把主窗口叫回来——托盘、通知点击、二次启动都走这一条
+/// 桌面模式里的窗口垫在桌面最底层、还点不到，先退出来再露脸
+fn reveal_main_window(app: &tauri::AppHandle) {
+    if WALLPAPER_MODE.load(Ordering::SeqCst) {
+        let _ = set_wallpaper_mode_impl(app, false);
+    }
+
+    let Some(window) = app.get_webview_window("main") else {
+        return;
+    };
+
+    let _ = window.show();
+    let _ = window.unminimize();
+    let _ = window.set_focus();
+    let _ = app.emit("show-from-tray", ());
+}
+
+/// 发一条系统通知——点了通知就回到软件界面
+/// 插件（tauri-plugin-notification）发的 toast 拿不到点击回调，
+/// 所以这里绕开它直接用 WinRT 的 Toast，牺牲一句权限检查换来「点一下就能回去」
+///
+/// 通知挂在应用自己的 AppUserModelID 下面——安装包的开始菜单快捷方式里登记过它。
+/// 挂到 PowerShell 名下的话 Windows 认不出是谁发的，通知会被直接吞掉（桃华踩过一次）
+#[tauri::command]
+fn show_alert_notification(app: tauri::AppHandle, title: String, body: String) -> Result<(), String> {
+    #[cfg(target_os = "windows")]
+    {
+        let toast = tauri_winrt_notification::Toast::new(&app.config().identifier)
+            .title(&title)
+            .text1(&body)
+            .on_activated(move |_| {
+                reveal_main_window(&app);
+                Ok(())
+            });
+
+        toast.show().map_err(|e| {
+            eprintln!("[通知] {}", e);
+            e.to_string()
+        })
+    }
+
+    #[cfg(not(target_os = "windows"))]
+    {
+        let _ = (&app, &title, &body);
+        Ok(())
+    }
+}
+
 // ─── 应用入口 ──────────────────────────────────────────────────────
 
 fn main() {
@@ -423,10 +525,7 @@ fn main() {
             Some(vec!["--hidden"]),
         ))
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
-            if let Some(window) = app.get_webview_window("main") {
-                let _ = window.show();
-                let _ = window.set_focus();
-            }
+            reveal_main_window(app);
         }))
         // 应用初始化
         .setup(|app| {
@@ -465,6 +564,8 @@ fn main() {
             get_store,
             set_store,
             read_file_as_data_url,
+            save_background_image,
+            clear_background_image,
             get_app_icon,
             write_text_file,
             set_wallpaper_mode,
@@ -473,6 +574,7 @@ fn main() {
             log_error,
             exit_app,
             open_external,
+            show_alert_notification,
         ]);
 
     builder.run(tauri::generate_context!()).expect("error while running Minagi Alarm");

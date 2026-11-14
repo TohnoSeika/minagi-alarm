@@ -31,27 +31,15 @@ export default function StickyNote({ note, zIndex, onChange, onDelete, onFocus }
   const [menuPos, setMenuPos] = useState({ x: 0, y: 0 })
   const [confirmOpen, setConfirmOpen] = useState(false)
   const dragStart = useRef({ x: 0, y: 0, cx: 0, cy: 0 })
-  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const noteRef = useRef(note)
   noteRef.current = note
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  const save = useCallback((d: StickyData) => {
-    onChange(d)
-  }, [onChange])
-
+  // 打字直接交给上层——落盘的 debounce 在 App 里统一做，这里再存一次反而白写
   const handleTextChange = useCallback((text: string) => {
     if (text.length > MAX_LENGTH) return
-    const next = { ...note, text }
-    if (saveTimer.current) clearTimeout(saveTimer.current)
-    saveTimer.current = setTimeout(() => save(next), 500)
-    onChange(next)
-  }, [note, save, onChange])
-
-  const handleBlur = useCallback(() => {
-    if (saveTimer.current) clearTimeout(saveTimer.current)
-    save(note)
-  }, [note, save])
+    onChange({ ...note, text })
+  }, [note, onChange])
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     const target = e.target as HTMLElement
@@ -72,21 +60,22 @@ export default function StickyNote({ note, zIndex, onChange, onDelete, onFocus }
     ta.setSelectionRange(len, len)
   }, [])
 
+  // 依赖里只留 dragging——note 每动一帧都变，放进来等于每帧重装一次全局监听
   useEffect(() => {
     if (!dragging) return
     const handleMove = (e: MouseEvent) => {
+      const current = noteRef.current
       const dx = e.clientX - dragStart.current.x
       const dy = e.clientY - dragStart.current.y
-      const next = {
-        ...note,
+      onChange({
+        ...current,
         x: Math.max(2, Math.min(98, dragStart.current.cx + (dx / window.innerWidth) * 100)),
         y: Math.max(26, Math.min(96, dragStart.current.cy + (dy / window.innerHeight) * 100)),
-      }
-      onChange(next)
+      })
     }
     const handleUp = () => {
       setDragging(false)
-      save(noteRef.current)
+      onChange(noteRef.current)
     }
     window.addEventListener('mousemove', handleMove)
     window.addEventListener('mouseup', handleUp)
@@ -94,7 +83,7 @@ export default function StickyNote({ note, zIndex, onChange, onDelete, onFocus }
       window.removeEventListener('mousemove', handleMove)
       window.removeEventListener('mouseup', handleUp)
     }
-  }, [dragging, note, onChange, save])
+  }, [dragging, onChange])
 
   const handlePinContextMenu = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
@@ -170,7 +159,6 @@ export default function StickyNote({ note, zIndex, onChange, onDelete, onFocus }
           className="sticky-note__text"
           value={note.text}
           onChange={e => handleTextChange(e.target.value)}
-          onBlur={handleBlur}
           onFocus={() => onFocus(note.id)}
           onClick={e => e.stopPropagation()}
           onDoubleClick={e => e.stopPropagation()}

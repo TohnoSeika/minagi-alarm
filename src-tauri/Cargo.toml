@@ -25,6 +25,8 @@ windows-sys = { version = "0.52", features = [
     "Win32_Foundation",
     "Win32_UI_WindowsAndMessaging",
 ] }
+# 通知点击靠它——插件发的 toast 收不到点击回调，这里自己发
+tauri-winrt-notification = "0.7"
 
 [profile.release]
 strip = true

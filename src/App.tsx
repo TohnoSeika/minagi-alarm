@@ -238,25 +238,50 @@ function App() {
 
   const STICKY_KEY = 'minagi-alarm-sticky-notes'
 
-  useEffect(() => {
-    window.electronAPI.storeGet(SETTINGS_KEY).then(data => {
-      if (data && typeof data === 'object') {
-        const loaded = data as Partial<SettingsData> & { startInClockMode?: boolean }
-        // 兼容旧版本 boolean → 迁移到新字段
-        if (typeof loaded.startInClockMode === 'boolean') {
-          loaded.startupPage = loaded.startInClockMode ? 'clock' : 'alarm'
-          delete loaded.startInClockMode
-        }
-        setSettings(prev => ({ ...prev, ...loaded }))
-        // 冷启动时根据启动页面设置自动切换
-        if (loaded.startupPage === 'clock') {
-          setClockMode(true)
-        } else if (loaded.startupPage) {
-          setPage(loaded.startupPage)
-        }
-      }
-    }).catch(() => {})
+  // 设置写盘时把背景图换成 "file:路径"——设置 JSON 里不再塞 base64 大图
+  const persistSettings = useCallback(async (next: SettingsData) => {
+    try {
+      const bgImage = await window.electronAPI.persistBackground(next.bgImage)
+      await window.electronAPI.storeSet(SETTINGS_KEY, { ...next, bgImage })
+    } catch {
+      // 写盘失败就先留在内存里，下次改动还会再写一遍
+    }
   }, [])
+
+  useEffect(() => {
+    ;(async () => {
+      const data = await window.electronAPI.storeGet(SETTINGS_KEY)
+      if (!data || typeof data !== 'object') return
+
+      const loaded = data as Partial<SettingsData> & { startInClockMode?: boolean }
+      // 兼容旧版本 boolean → 迁移到新字段
+      if (typeof loaded.startInClockMode === 'boolean') {
+        loaded.startupPage = loaded.startInClockMode ? 'clock' : 'alarm'
+        delete loaded.startInClockMode
+      }
+
+      // 旧版本把整张图的 base64 存在设置里——读到之后顺手迁移成独立文件
+      const wasInlineImage = typeof loaded.bgImage === 'string' && loaded.bgImage.startsWith('data:')
+      if (typeof loaded.bgImage === 'string') {
+        loaded.bgImage = await window.electronAPI.restoreBackground(loaded.bgImage)
+      }
+
+      const merged = { ...DEFAULT_SETTINGS, ...loaded }
+      setSettings(prev => ({ ...prev, ...loaded }))
+
+      // 窗口透明度在启动时就应用，别等用户先进一次设置页
+      window.electronAPI.setOpacity(merged.opacity)
+
+      if (wasInlineImage) persistSettings(merged)
+
+      // 冷启动时根据启动页面设置自动切换
+      if (loaded.startupPage === 'clock') {
+        setClockMode(true)
+      } else if (loaded.startupPage) {
+        setPage(loaded.startupPage)
+      }
+    })().catch(() => {})
+  }, [persistSettings])
 
   // 加载便利贴
   useEffect(() => {
@@ -301,8 +326,8 @@ function App() {
 
   const handleSettingsChange = useCallback((s: SettingsData) => {
     setSettings(s)
-    window.electronAPI.storeSet(SETTINGS_KEY, s).catch(() => {})
-  }, [])
+    persistSettings(s)
+  }, [persistSettings])
 
   const handleDismissAlert = useCallback(() => {
     stopSound()
@@ -359,21 +384,29 @@ function App() {
   }, [])
 
   const handlePreviewConfirm = useCallback((s: number, ox: number, oy: number) => {
-    setSettings(prev => {
-      const next = { ...prev, bgImage: previewImage, bgScale: s, bgOffsetX: ox, bgOffsetY: oy }
-      window.electronAPI.storeSet(SETTINGS_KEY, next)
-      return next
-    })
+    const next = {
+      ...settingsRef.current,
+      bgImage: previewImage,
+      bgScale: s,
+      bgOffsetX: ox,
+      bgOffsetY: oy,
+    }
+    setSettings(next)
+    persistSettings(next)
     setPreviewOpen(false)
-  }, [previewImage])
+  }, [previewImage, persistSettings])
 
   const handleRestoreDefaultBg = useCallback(() => {
-    setSettings(prev => {
-      const next = { ...prev, bgImage: defaultBgImage, bgScale: DEFAULT_BG_SCALE, bgOffsetX: DEFAULT_BG_OFFSET_X, bgOffsetY: DEFAULT_BG_OFFSET_Y }
-      window.electronAPI.storeSet(SETTINGS_KEY, next)
-      return next
-    })
-  }, [])
+    const next = {
+      ...settingsRef.current,
+      bgImage: defaultBgImage,
+      bgScale: DEFAULT_BG_SCALE,
+      bgOffsetX: DEFAULT_BG_OFFSET_X,
+      bgOffsetY: DEFAULT_BG_OFFSET_Y,
+    }
+    setSettings(next)
+    persistSettings(next)
+  }, [persistSettings])
 
   const handleEnterClockMode = useCallback(() => {
     setClockMode(true)
@@ -501,23 +534,40 @@ function App() {
     setShowClockMusic(false)
   }, [])
 
-  // 便利贴操作
+  // 便利贴操作——拖动和打字都会疯狂触发 onChange，落盘得 debounce 一下
   const pendingStickySave = useRef<StickyData[] | null>(null)
-  const saveStickyNotes = useCallback((notes: StickyData[]) => {
-    window.electronAPI.storeSet(STICKY_KEY, notes).catch(() => {
-      // IPC 写入失败，暂存内存等下次机会重试
-      pendingStickySave.current = notes
-    })
+  const stickySaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const flushStickyNotes = useCallback(() => {
+    const notes = pendingStickySave.current
+    if (!notes) return
+    if (stickySaveTimer.current) {
+      clearTimeout(stickySaveTimer.current)
+      stickySaveTimer.current = null
+    }
+    window.electronAPI.storeSet(STICKY_KEY, notes)
+      .then(() => {
+        if (pendingStickySave.current === notes) pendingStickySave.current = null
+      })
+      .catch(() => {
+        // 写盘失败就留着 pending，下次改动时再试
+      })
   }, [])
 
-  // 重试暂存的便利贴保存
+  const saveStickyNotes = useCallback((notes: StickyData[]) => {
+    pendingStickySave.current = notes
+    if (stickySaveTimer.current) clearTimeout(stickySaveTimer.current)
+    stickySaveTimer.current = setTimeout(flushStickyNotes, 300)
+  }, [flushStickyNotes])
+
+  // 关闭窗口前把还没落盘的那一次补上
   useEffect(() => {
-    if (!pendingStickySave.current) return
-    const notes = pendingStickySave.current
-    window.electronAPI.storeSet(STICKY_KEY, notes).then(() => {
-      pendingStickySave.current = null
-    }).catch(() => {})
-  })  // 每次渲染都检查，有暂存就重试
+    window.addEventListener('beforeunload', flushStickyNotes)
+    return () => {
+      window.removeEventListener('beforeunload', flushStickyNotes)
+      flushStickyNotes()
+    }
+  }, [flushStickyNotes])
 
   const handleNoteChange = useCallback((updated: StickyData) => {
     setStickyNotes(prev => {

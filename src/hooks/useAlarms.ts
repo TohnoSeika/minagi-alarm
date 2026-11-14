@@ -69,25 +69,28 @@ export function useAlarms() {
   const snoozeAlarmIdRef = useRef<string | null>(null)
 
   // 加载闹钟
+  const loadedRef = useRef(false)
   useEffect(() => {
     const load = async () => {
       try {
         const data = await window.electronAPI.storeGet(STORAGE_KEY)
-        if (Array.isArray(data) && data.length > 0) {
+        if (Array.isArray(data)) {
           setAlarms(data as Alarm[])
         }
       } catch {
         // 首次使用，还没有存储数据
+      } finally {
+        // 读完才允许回写——不然启动时那一次空数组会把存储里的闹钟洗掉
+        loadedRef.current = true
       }
     }
     load()
   }, [])
 
-  // 保存闹钟
+  // 保存闹钟（空列表也要存——删掉最后一个闹钟不该在重启后原地复活）
   useEffect(() => {
-    if (alarms.length > 0) {
-      window.electronAPI.storeSet(STORAGE_KEY, alarms)
-    }
+    if (!loadedRef.current) return
+    window.electronAPI.storeSet(STORAGE_KEY, alarms).catch(() => {})
   }, [alarms])
 
   // 每分钟检查闹钟
@@ -119,6 +122,13 @@ export function useAlarms() {
           `⏰ ${alarm.time}`,
           alarm.label || '闹钟时间到了',
         )
+
+        // 「仅一次」响过就关掉，不然 alertedSet 每天清空之后它明天还会再响
+        if (alarm.repeat === 'once') {
+          setAlarms(prev => prev.map(a =>
+            a.id === alarm.id ? { ...a, enabled: false } : a
+          ))
+        }
       })
 
       // 清理过期的 alert 记录（跨天后）
