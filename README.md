@@ -113,9 +113,10 @@ Download the latest installer from the [Releases](https://github.com/TohnoSeika/
 2. Snooze state is now persisted — it resumes after a restart and is cleaned up if the app was closed for too long.
 3. A corrupted store file is backed up to `.bad` instead of being overwritten.
 4. Fixed custom ringtones occasionally staying silent; falls back to the built-in chime when loading fails.
-5. Buttons and selected items switch to dark text on very light theme colors for better contrast.
-6. Desktop-mode opacity now previews live only while in desktop mode; when launched hidden at startup, entering desktop mode from the tray now shows the window.
-7. Translated the remaining file dialogs and error messages; notification texts are localized; no more white flash at startup; the installer overwrites in place without asking you to uninstall first.
+5. Fixed some buttons still showing the default pink on hover or press after changing the theme color.
+6. Buttons and selected items switch to dark text on very light theme colors for better contrast.
+7. Desktop-mode opacity now previews live only while in desktop mode; when launched hidden at startup, entering desktop mode from the tray now shows the window.
+8. Translated the remaining file dialogs and error messages; notification texts are localized; no more white flash at startup; the installer overwrites in place without asking you to uninstall first.
 
 ### v1.6.0
 1. Clicking the alarm / countdown notification now brings the app window back.
