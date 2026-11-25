@@ -3,7 +3,6 @@
  * 鼠标滚轮调整时/分，24小时制
  */
 
-import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 interface Props {
@@ -16,8 +15,6 @@ function pad(n: number) { return String(n).padStart(2, '0') }
 
 export default function TimeWheel({ hour, minute, onChange }: Props) {
   const { t } = useTranslation()
-  const hRef = useRef<HTMLDivElement>(null)
-  const mRef = useRef<HTMLDivElement>(null)
 
   const onWheel = (field: 'h' | 'm', delta: number) => {
     const dir = delta > 0 ? -1 : 1
@@ -31,7 +28,6 @@ export default function TimeWheel({ hour, minute, onChange }: Props) {
   return (
     <div className="timewheel">
       <div className="timewheel__col"
-        ref={hRef}
         onWheel={e => { e.preventDefault(); onWheel('h', e.deltaY) }}
       >
         <button className="timewheel__arrow" onClick={() => onChange((hour - 1 + 24) % 24, minute)}>▲</button>
@@ -43,7 +39,6 @@ export default function TimeWheel({ hour, minute, onChange }: Props) {
       <div className="timewheel__sep">:</div>
 
       <div className="timewheel__col"
-        ref={mRef}
         onWheel={e => { e.preventDefault(); onWheel('m', e.deltaY) }}
       >
         <button className="timewheel__arrow" onClick={() => onChange(hour, (minute - 1 + 60) % 60)}>▲</button>

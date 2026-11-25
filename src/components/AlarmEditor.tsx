@@ -49,7 +49,10 @@ export default function AlarmEditor({ alarm, onSave, onClose, onDelete, globalSo
     ['custom', t('alarm.repeat.custom')],
   ]
 
+  const customDaysMissing = repeat === 'custom' && repeatDays.length === 0
+
   const handleSave = () => {
+    if (customDaysMissing) return
     onSave({
       time: `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`,
       label: label.trim(),
@@ -121,17 +124,22 @@ export default function AlarmEditor({ alarm, onSave, onClose, onDelete, globalSo
           </div>
 
           {repeat === 'custom' && (
-            <div className="weekday-group">
-              {weekdayNames.map((name, i) => (
-                <button
-                  key={i}
-                  className={`weekday-btn ${repeatDays.includes(i) ? 'weekday-btn--active' : ''}`}
-                  onClick={() => toggleWeekday(i)}
-                >
-                  {name}
-                </button>
-              ))}
-            </div>
+            <>
+              <div className="weekday-group">
+                {weekdayNames.map((name, i) => (
+                  <button
+                    key={i}
+                    className={`weekday-btn ${repeatDays.includes(i) ? 'weekday-btn--active' : ''}`}
+                    onClick={() => toggleWeekday(i)}
+                  >
+                    {name}
+                  </button>
+                ))}
+              </div>
+              {customDaysMissing && (
+                <div className="form-hint">{t('alarm.editor.pickWeekday')}</div>
+              )}
+            </>
           )}
         </div>
 
@@ -160,7 +168,7 @@ export default function AlarmEditor({ alarm, onSave, onClose, onDelete, globalSo
             <>
               <div style={{ flex: 1 }} />
               <button className="btn btn--secondary" onClick={onClose}>{t('alarm.editor.cancel')}</button>
-              <button className="btn btn--primary" onClick={handleSave}>{t('alarm.editor.save')}</button>
+              <button className="btn btn--primary" onClick={handleSave} disabled={customDaysMissing}>{t('alarm.editor.save')}</button>
             </>
           )}
         </div>

@@ -30,7 +30,8 @@ export interface ElectronAPI {
   restoreBackground: (stored: string) => Promise<string>
   onShowFromTray: (callback: () => void) => () => void
   onWallpaperModeChanged: (callback: (enabled: boolean) => void) => () => void
-  onToggleWallpaperMode: (callback: () => void) => () => void
+  /** 托盘点了「退出软件」——先让前端把没落盘的改动交出来，再真正退出 */
+  onAppQuitRequested: (callback: () => void) => () => void
   platform: string
 }
 

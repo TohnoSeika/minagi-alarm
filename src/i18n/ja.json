@@ -88,7 +88,8 @@
       "delete": "アラームを削除",
       "confirmDelete": "削除を確認",
       "title": "新しいアラーム",
-      "editTitle": "アラームを編集"
+      "editTitle": "アラームを編集",
+      "pickWeekday": "曜日を1つ以上選んでください"
     },
     "alert": {
       "dismiss": "閉じる",
@@ -167,7 +168,7 @@
     },
     "opacity": "ウィンドウの透明度",
     "wallpaperOpacity": "デスクトップモードの透明度",
-    "wallpaperHint": "スライダーをドラッグしてプレビュー、離して元に戻す",
+    "wallpaperHint": "デスクトップモード中にドラッグしてプレビュー",
     "about": {
       "developed": "Developed by",
       "credit": "im minagi , im everywhere",
@@ -230,5 +231,15 @@
     "dragHint": "ドラッグで移動",
     "frameHint": "破線＝ウィンドウ範囲",
     "keyHint": "Esc キャンセル · Enter 確定"
+  },
+  "dialogs": {
+    "pickAudio": "カスタム音を選択",
+    "pickImage": "背景画像を選択",
+    "exportSticky": "付箋を書き出す",
+    "audioFiles": "オーディオファイル",
+    "imageFiles": "画像ファイル"
+  },
+  "errorBoundary": {
+    "message": "😢 ちょっと問題が起きました。ページを切り替えてみてください。"
   }
 }

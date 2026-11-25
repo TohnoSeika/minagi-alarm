@@ -88,7 +88,8 @@
       "delete": "删除闹钟",
       "confirmDelete": "确认删除",
       "title": "新建闹钟",
-      "editTitle": "编辑闹钟"
+      "editTitle": "编辑闹钟",
+      "pickWeekday": "至少要选一天哦"
     },
     "alert": {
       "dismiss": "关闭",
@@ -167,7 +168,7 @@
     },
     "opacity": "软件界面透明度",
     "wallpaperOpacity": "桌面模式透明度",
-    "wallpaperHint": "拖拽滑块可实时预览，松手后恢复当前界面透明度",
+    "wallpaperHint": "桌面模式下拖动即可实时预览",
     "about": {
       "developed": "Developed by",
       "credit": "im minagi , im everywhere",
@@ -230,5 +231,15 @@
     "dragHint": "拖动移动",
     "frameHint": "虚线=界面区域",
     "keyHint": "Esc 取消 · Enter 确认"
+  },
+  "dialogs": {
+    "pickAudio": "选择自定义提示音",
+    "pickImage": "选择背景图片",
+    "exportSticky": "导出便利贴",
+    "audioFiles": "音频文件",
+    "imageFiles": "图片文件"
+  },
+  "errorBoundary": {
+    "message": "😢 出了点小问题，切换一下页面就好了～"
   }
 }

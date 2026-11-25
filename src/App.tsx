@@ -25,7 +25,6 @@ import i18n, { detectSystemLanguage } from './i18n'
 import { useAlarms } from './hooks/useAlarms'
 import { useTimer } from './hooks/useTimer'
 import { useCustomSounds, useAudio, SoundOption } from './hooks/useAudio'
-import { useWindowTitlebar } from './hooks/useWindowTitlebar'
 
 type Page = 'alarm' | 'timer' | 'settings'
 
@@ -94,7 +93,6 @@ function App() {
   const timer = useTimer()
   const { customSounds, addCustomSound, removeCustomSound } = useCustomSounds()
   const { playSound, stopSound, setOnAudioEnded, setVolume } = useAudio()
-  const { handleMinimize, handleClose } = useWindowTitlebar()
   const soundPlayedRef = useRef(false)
   const [wallpaperMode, setWallpaperMode] = useState(false)
   const wallpaperModeRef = useRef(false)  // 供副效应闭包读取最新值
@@ -244,6 +242,48 @@ function App() {
 
   const STICKY_KEY = 'minagi-alarm-sticky-notes'
 
+  // 便利贴操作——拖动和打字都会疯狂触发 onChange，落盘得 debounce 一下
+  const pendingStickySave = useRef<StickyData[] | null>(null)
+  const stickySaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const flushStickyNotes = useCallback((): Promise<void> => {
+    const notes = pendingStickySave.current
+    if (!notes) return Promise.resolve()
+    if (stickySaveTimer.current) {
+      clearTimeout(stickySaveTimer.current)
+      stickySaveTimer.current = null
+    }
+    return window.electronAPI.storeSet(STICKY_KEY, notes)
+      .then(() => {
+        if (pendingStickySave.current === notes) pendingStickySave.current = null
+      })
+      .catch(() => {
+        // 写盘失败就留着 pending，下次改动时再试
+      })
+  }, [])
+
+  const saveStickyNotes = useCallback((notes: StickyData[]) => {
+    pendingStickySave.current = notes
+    if (stickySaveTimer.current) clearTimeout(stickySaveTimer.current)
+    stickySaveTimer.current = setTimeout(flushStickyNotes, 300)
+  }, [flushStickyNotes])
+
+  // 关闭窗口前把还没落盘的那一次补上
+  useEffect(() => {
+    window.addEventListener('beforeunload', flushStickyNotes)
+    return () => {
+      window.removeEventListener('beforeunload', flushStickyNotes)
+      flushStickyNotes()
+    }
+  }, [flushStickyNotes])
+
+  // 托盘里的「退出软件」是直接结束进程，不会触发 beforeunload——先补完再退出
+  useEffect(() => {
+    return window.electronAPI.onAppQuitRequested(() => {
+      flushStickyNotes().finally(() => window.electronAPI.exitApp())
+    })
+  }, [flushStickyNotes])
+
   // 设置写盘时把背景图换成 "file:路径"——设置 JSON 里不再塞 base64 大图
   const persistSettings = useCallback(async (next: SettingsData) => {
     try {
@@ -322,11 +362,15 @@ function App() {
     const r = parseInt(settings.themeColor.slice(1, 3), 16)
     const g = parseInt(settings.themeColor.slice(3, 5), 16)
     const b = parseInt(settings.themeColor.slice(5, 7), 16)
+    // 主题色太浅的时候白字会看不清——按亮度换一份深色的字
+    const brightness = (r * 299 + g * 587 + b * 114) / 255000
     const root = document.documentElement
+    root.style.setProperty('--on-pink', brightness > 0.8 ? '#4A2C35' : '#FFFFFF')
     root.style.setProperty('--pink', colors.pink)
     root.style.setProperty('--pink-light', colors.pinkLight)
     root.style.setProperty('--pink-dark', colors.pinkDark)
     root.style.setProperty('--pink-glow', colors.pinkGlow)
+    root.style.setProperty('--pink-rgb', `${r}, ${g}, ${b}`)
     root.style.setProperty('--shadow-pink', `0 3px 16px rgba(${r},${g},${b},0.25)`)
   }, [settings.themeColor])
 
@@ -354,8 +398,13 @@ function App() {
   }, [settings.minimizeToTray])
 
   const handleCloseWithSetting = useCallback(() => {
-    settings.closeToTray ? window.electronAPI.closeWindow() : window.electronAPI.exitApp()
-  }, [settings.closeToTray])
+    if (settings.closeToTray) {
+      window.electronAPI.closeWindow()
+      return
+    }
+    // exit() 不会再给 beforeunload 机会，先把还没落盘的便利贴补上
+    flushStickyNotes().finally(() => window.electronAPI.exitApp())
+  }, [settings.closeToTray, flushStickyNotes])
 
   const toggleWallpaperMode = useCallback(async () => {
     const next = !wallpaperMode
@@ -375,14 +424,6 @@ function App() {
       : settingsRef.current.opacity
     window.electronAPI.animateOpacity(target, 400)
   }, [wallpaperMode])
-
-  // 托盘菜单「桌面模式」按钮被点击时——前端来执行实际的切换
-  useEffect(() => {
-    const cleanup = window.electronAPI.onToggleWallpaperMode(() => {
-      toggleWallpaperMode()
-    })
-    return cleanup
-  }, [toggleWallpaperMode])
 
   const openPreview = useCallback((img: string) => {
     setPreviewImage(img)
@@ -539,41 +580,6 @@ function App() {
   const closeClockMusic = useCallback(() => {
     setShowClockMusic(false)
   }, [])
-
-  // 便利贴操作——拖动和打字都会疯狂触发 onChange，落盘得 debounce 一下
-  const pendingStickySave = useRef<StickyData[] | null>(null)
-  const stickySaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  const flushStickyNotes = useCallback(() => {
-    const notes = pendingStickySave.current
-    if (!notes) return
-    if (stickySaveTimer.current) {
-      clearTimeout(stickySaveTimer.current)
-      stickySaveTimer.current = null
-    }
-    window.electronAPI.storeSet(STICKY_KEY, notes)
-      .then(() => {
-        if (pendingStickySave.current === notes) pendingStickySave.current = null
-      })
-      .catch(() => {
-        // 写盘失败就留着 pending，下次改动时再试
-      })
-  }, [])
-
-  const saveStickyNotes = useCallback((notes: StickyData[]) => {
-    pendingStickySave.current = notes
-    if (stickySaveTimer.current) clearTimeout(stickySaveTimer.current)
-    stickySaveTimer.current = setTimeout(flushStickyNotes, 300)
-  }, [flushStickyNotes])
-
-  // 关闭窗口前把还没落盘的那一次补上
-  useEffect(() => {
-    window.addEventListener('beforeunload', flushStickyNotes)
-    return () => {
-      window.removeEventListener('beforeunload', flushStickyNotes)
-      flushStickyNotes()
-    }
-  }, [flushStickyNotes])
 
   const handleNoteChange = useCallback((updated: StickyData) => {
     setStickyNotes(prev => {
@@ -824,7 +830,7 @@ function App() {
         </>
       )}
 
-      {page === 'alarm' && alarms.snoozeUntil > 0 && (
+      {alarms.snoozeUntil > 0 && (
         <SnoozeIndicator snoozeUntil={alarms.snoozeUntil} label={alarms.alertLabel}
           onCancel={() => { alarms.dismissAlert(); stopSound(); soundPlayedRef.current = false }} />
       )}

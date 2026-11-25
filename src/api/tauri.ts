@@ -10,6 +10,7 @@ import { open, save } from '@tauri-apps/plugin-dialog'
 import { isPermissionGranted, requestPermission, sendNotification } from '@tauri-apps/plugin-notification'
 import { enable as enableAutoLaunch, disable as disableAutoLaunch } from '@tauri-apps/plugin-autostart'
 import { listen, type UnlistenFn } from '@tauri-apps/api/event'
+import i18n from '../i18n'
 import type { ElectronAPI } from '../types'
 
 const appWindow = getCurrentWindow()
@@ -186,8 +187,8 @@ export const tauriAPI: ElectronAPI = {
   openAudioDialog: async () => {
     try {
       const result = await open({
-        title: '选择自定义提示音',
-        filters: [{ name: '音频文件', extensions: ['mp3', 'wav', 'ogg', 'flac', 'm4a', 'aac'] }],
+        title: i18n.t('dialogs.pickAudio'),
+        filters: [{ name: i18n.t('dialogs.audioFiles'), extensions: ['mp3', 'wav', 'ogg', 'flac', 'm4a', 'aac'] }],
         multiple: false,
         directory: false,
       })
@@ -202,8 +203,8 @@ export const tauriAPI: ElectronAPI = {
   openImageDialog: async () => {
     try {
       const result = await open({
-        title: '选择背景图片',
-        filters: [{ name: '图片文件', extensions: ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp'] }],
+        title: i18n.t('dialogs.pickImage'),
+        filters: [{ name: i18n.t('dialogs.imageFiles'), extensions: ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp'] }],
         multiple: false,
         directory: false,
       })
@@ -218,7 +219,7 @@ export const tauriAPI: ElectronAPI = {
   saveFile: async (defaultName: string, content: string) => {
     try {
       const result = await save({
-        title: '导出便利贴',
+        title: i18n.t('dialogs.exportSticky'),
         defaultPath: defaultName,
         filters: [{ name: 'Markdown', extensions: ['md'] }],
       })
@@ -279,7 +280,7 @@ export const tauriAPI: ElectronAPI = {
 
   onWallpaperModeChanged: (callback: (enabled: boolean) => void) => onEvent<boolean>('wallpaper-mode-changed', callback),
 
-  onToggleWallpaperMode: (callback: () => void) => onEvent('toggle-wallpaper-mode', () => callback()),
+  onAppQuitRequested: (callback: () => void) => onEvent('app-quit-requested', () => callback()),
 
   // ─── 平台 ────────────────────────────────────────────────────────
   platform: PLATFORM,

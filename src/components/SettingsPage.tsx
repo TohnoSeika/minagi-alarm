@@ -165,17 +165,8 @@ export default function SettingsPage({ customSounds, onImportSound, onRemoveSoun
           onChange={e => {
             const val = parseInt(e.target.value) / 100
             update({ wallpaperOpacity: val })
-            // 拖拽时实时预览桌面模式透明度
-            window.electronAPI.setOpacity(val)
-          }}
-          onMouseUp={() => {
-            // 松手后恢复到当前应该显示的透明度
-            const restoreTo = wallpaperMode ? settings.wallpaperOpacity : settings.opacity
-            window.electronAPI.setOpacity(restoreTo)
-          }}
-          onTouchEnd={() => {
-            const restoreTo = wallpaperMode ? settings.wallpaperOpacity : settings.opacity
-            window.electronAPI.setOpacity(restoreTo)
+            // 只有桌面模式才实时预览——平时别把当前窗口弄透明
+            if (wallpaperMode) window.electronAPI.setOpacity(val)
           }}
         />
 
@@ -332,7 +323,7 @@ export default function SettingsPage({ customSounds, onImportSound, onRemoveSoun
         <div className="sound-modal-overlay" onClick={() => setShowSettingsHelp(false)}>
           <div className="sound-modal" onClick={e => e.stopPropagation()} style={{ width: 500 }}>
             <div className="sound-modal__header">
-              <span className="sound-modal__title">时钟模式操作说明</span>
+              <span className="sound-modal__title">{t('clock.helpTitle')}</span>
               <button className="sound-modal__close" onClick={() => setShowSettingsHelp(false)}>✕</button>
             </div>
             <div className="sound-modal__body" style={{ fontSize: 13, lineHeight: 2, color: 'var(--text-secondary)' }}>

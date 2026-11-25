@@ -28,8 +28,6 @@ export default function ClockMusicList({ customSounds, onClose, playingId, onPla
     return () => clearTimeout(timer)
   }, [showHint])
 
-  if (customSounds.length === 0) return null
-
   const playingTrack = customSounds.find(s => s.id === playingId)
   const vinylRef = useRef<HTMLButtonElement>(null)
 
@@ -67,6 +65,9 @@ export default function ClockMusicList({ customSounds, onClose, playingId, onPla
       btn.removeEventListener('mouseleave', handleLeave)
     }
   }, [])
+
+  // 所有 Hook 都走完再决定要不要渲染——不然列表空了，Hook 顺序就乱了
+  if (customSounds.length === 0) return null
 
   return (
     <div className="sound-modal-overlay" onClick={onClose} onDoubleClick={e => e.stopPropagation()}>

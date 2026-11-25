@@ -66,7 +66,6 @@ export default function AlarmList({ alarms, onAdd, onUpdate, onDelete, onToggle,
           ) : (
             alarms.map(alarm => (
               <AlarmItem key={alarm.id} alarm={alarm}
-                onUpdate={onUpdate} onDelete={onDelete}
                 onToggle={onToggle} onClick={handleClick}
                 customSounds={customSounds} />
             ))

@@ -9,8 +9,6 @@ import { BUILTIN_SOUNDS } from '../hooks/useAudio'
 
 interface Props {
   alarm: Alarm
-  onUpdate: (id: string, updates: Partial<Alarm>) => void
-  onDelete: (id: string) => void
   onToggle: (id: string) => void
   onClick: (alarm: Alarm) => void
   customSounds?: { id: string; name: string }[]
@@ -39,7 +37,7 @@ function soundName(soundId: string, customSounds?: { id: string; name: string }[
   return custom?.name || '—'
 }
 
-export default function AlarmItem({ alarm, onDelete, onToggle, onClick, customSounds }: Props) {
+export default function AlarmItem({ alarm, onToggle, onClick, customSounds }: Props) {
   return (
     <div
       className={`alarm-item ${!alarm.enabled ? 'alarm-item--disabled' : ''}`}

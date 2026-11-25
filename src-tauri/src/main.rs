@@ -9,7 +9,7 @@
 use base64::Engine;
 use serde_json::Value;
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::OnceLock;
 use tauri::Emitter;
@@ -30,14 +30,38 @@ fn get_store_path(app: &tauri::AppHandle) -> PathBuf {
     path.join("minagi-alarm-store.json")
 }
 
+/// 存储文件坏了，先留一份副本——别让下一次保存把原来的数据彻底盖掉
+fn back_up_corrupt_store(store_path: &Path) -> PathBuf {
+    let backup_path = PathBuf::from(format!("{}.bad", store_path.to_string_lossy()));
+    if let Err(err) = fs::copy(store_path, &backup_path) {
+        eprintln!("备份损坏的存储文件失败: {}", err);
+    }
+    backup_path
+}
+
+/// 读取并解析存储文件；损坏时先备份再返回错误，绝不拿空对象覆盖它
+fn read_store(store_path: &Path) -> Result<Value, String> {
+    let content = fs::read_to_string(store_path).map_err(|e| e.to_string())?;
+    let store: Value = serde_json::from_str(&content).map_err(|e| {
+        let backup = back_up_corrupt_store(store_path);
+        format!("存储文件损坏（{}），已备份到 {}", e, backup.display())
+    })?;
+
+    if !store.is_object() {
+        let backup = back_up_corrupt_store(store_path);
+        return Err(format!("存储文件格式不对，已备份到 {}", backup.display()));
+    }
+
+    Ok(store)
+}
+
 #[tauri::command]
 fn get_store(app: tauri::AppHandle, key: String) -> Result<Option<Value>, String> {
     let store_path = get_store_path(&app);
     if !store_path.exists() {
         return Ok(None);
     }
-    let data = fs::read_to_string(&store_path).map_err(|e| e.to_string())?;
-    let store: Value = serde_json::from_str(&data).map_err(|e| e.to_string())?;
+    let store = read_store(&store_path)?;
     Ok(store.get(&key).cloned())
 }
 
@@ -48,9 +72,9 @@ fn set_store(app: tauri::AppHandle, key: String, value: Value) -> Result<(), Str
         fs::create_dir_all(parent).map_err(|e| e.to_string())?;
     }
 
+    // 读不出来就直接报错收手——原来那份坏文件还留在磁盘上，前端至少不会把空数据写回去
     let mut store: Value = if store_path.exists() {
-        let content = fs::read_to_string(&store_path).map_err(|e| e.to_string())?;
-        serde_json::from_str(&content).unwrap_or(Value::Object(serde_json::Map::new()))
+        read_store(&store_path)?
     } else {
         Value::Object(serde_json::Map::new())
     };
@@ -89,8 +113,13 @@ fn file_as_data_url(path: &str) -> Result<String, String> {
         "aac" => "audio/aac",
         _ => "application/octet-stream",
     };
-    let b64 = base64::engine::general_purpose::STANDARD.encode(&data);
-    Ok(format!("data:{};base64,{}", mime, b64))
+    Ok(bytes_as_data_url(&data, mime))
+}
+
+/// 把内存里的字节编成 data URL
+fn bytes_as_data_url(data: &[u8], mime: &str) -> String {
+    let b64 = base64::engine::general_purpose::STANDARD.encode(data);
+    format!("data:{};base64,{}", mime, b64)
 }
 
 #[tauri::command]
@@ -152,21 +181,19 @@ async fn clear_background_image(app: tauri::AppHandle) -> Result<(), String> {
 
 // ─── 应用图标 ──────────────────────────────────────────────────────
 
+/// 图标直接编进二进制——装到别人的电脑上，资源目录里不一定带着它
+const APP_ICON_PNG: &[u8] = include_bytes!("../icons/icon.png");
+
 #[tauri::command]
 async fn get_app_icon(app: tauri::AppHandle) -> Result<Option<String>, String> {
+    // 资源目录里有就优先用它（方便换图标），没有就用编译时带上的那份
     if let Ok(resource_dir) = app.path().resource_dir() {
         let png_path = resource_dir.join("icons/icon.png");
         if png_path.exists() {
             return file_as_data_url(&png_path.to_string_lossy()).map(Some);
         }
     }
-    // 从项目目录查找
-    let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    let local_png = manifest_dir.join("icons/icon.png");
-    if local_png.exists() {
-        return file_as_data_url(&local_png.to_string_lossy()).map(Some);
-    }
-    Ok(None)
+    Ok(Some(bytes_as_data_url(APP_ICON_PNG, "image/png")))
 }
 
 // ─── 写入文本文件（便利贴导出） ──────────────────────────────────
@@ -286,6 +313,10 @@ fn set_wallpaper_mode_impl(app: &tauri::AppHandle, enabled: bool) -> Result<(), 
     if enabled {
         win.set_skip_taskbar(true).map_err(|e| e.to_string())?;
         set_window_transparent(&win, true)?;
+        // 开机自启的窗口是藏着的——从托盘直接开桌面模式时，先让它出来，不然桌面上什么都看不到
+        if !win.is_visible().unwrap_or(false) {
+            win.show().map_err(|e| e.to_string())?;
+        }
         #[cfg(target_os = "windows")]
         push_window_to_bottom(&win)?;
     } else {
@@ -409,7 +440,13 @@ fn setup_tray(app: &tauri::App) -> Result<(), Box<dyn std::error::Error>> {
                     let _ = set_wallpaper_mode_impl(app, next);
                 }
                 "quit" => {
-                    app.exit(0);
+                    // 先请前端把还没落盘的便利贴交出来；前端要是没反应，1.2 秒后自己退出
+                    let _ = app.emit("app-quit-requested", ());
+                    let app_handle = app.clone();
+                    std::thread::spawn(move || {
+                        std::thread::sleep(std::time::Duration::from_millis(1200));
+                        app_handle.exit(0);
+                    });
                 }
                 _ => {}
             }

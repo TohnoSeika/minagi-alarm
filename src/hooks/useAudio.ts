@@ -126,16 +126,21 @@ export function useAudio() {
 
   const loopRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const onEndedRef = useRef<(() => void) | null>(null)
+  /** 播放代次——每次播放/停止都会 +1，用来作废那些还在加载中的旧请求 */
+  const playbackGenRef = useRef(0)
 
-  /** 播放自定义音频文件，volume 仅影响本次播放的初始音量 */
-  const playCustom = useCallback(async (filePath: string, loop: boolean = false, volume: number = 0.6) => {
+  /** 播放自定义音频文件，volume 仅影响本次播放的初始音量；返回是否真的播起来了 */
+  const playCustom = useCallback(async (filePath: string, loop: boolean = false, volume: number = 0.6): Promise<boolean> => {
+    const gen = playbackGenRef.current
     if (audioElRef.current) {
       audioElRef.current.pause()
       audioElRef.current = null
     }
     try {
       const dataUrl = await window.electronAPI.audioRead(filePath)
-      if (!dataUrl) return
+      // 文件还在读的时候，别的播放或停止已经抢先了——这次就不作数
+      if (gen !== playbackGenRef.current || !dataUrl) return false
+
       const audio = new Audio(dataUrl)
       audio.volume = volume
       audio.loop = loop
@@ -143,9 +148,15 @@ export function useAudio() {
         audio.onended = () => onEndedRef.current?.()
       }
       await audio.play()
+      if (gen !== playbackGenRef.current) {
+        audio.pause()
+        return false
+      }
       audioElRef.current = audio
+      return true
     } catch (err) {
       console.error('播放自定义音频失败:', err)
+      return false
     }
   }, [])
 
@@ -158,26 +169,47 @@ export function useAudio() {
       audioElRef.current.currentTime = 0
       audioElRef.current = null
     }
+    const gen = ++playbackGenRef.current
+
+    const startBuiltin = (id: string) => {
+      playBuiltin(id)
+      if (!loop) return
+      // 内置音定时重播（根据声音长度设定间隔）
+      const intervals: Record<string, number> = { chime: 1200, gentle: 2000, bell: 2500, birds: 2200, piano: 3000 }
+      loopRef.current = setInterval(() => {
+        if (audioCtxRef.current?.state === 'closed') {
+          audioCtxRef.current = new AudioContext()
+        }
+        playBuiltin(id)
+      }, intervals[id] || 2000)
+    }
+
+    /** 自定义铃声坏了、没了——退回内置提示音，总比一声不吭好 */
+    const fallbackToChime = () => {
+      if (gen !== playbackGenRef.current) return
+      startBuiltin('chime')
+    }
 
     const builtin = BUILTIN_SOUNDS.find(s => s.id === soundId)
     if (builtin) {
-      playBuiltin(soundId)
-      if (loop) {
-        // 内置音定时重播（根据声音长度设定间隔）
-        const intervals: Record<string, number> = { chime: 1200, gentle: 2000, bell: 2500, birds: 2200, piano: 3000 }
-        loopRef.current = setInterval(() => {
-          if (audioCtxRef.current?.state === 'closed') {
-            audioCtxRef.current = new AudioContext()
-          }
-          playBuiltin(soundId)
-        }, intervals[soundId] || 2000)
-      }
-    } else if (customPath) {
-      playCustom(customPath, loop, volume)
+      startBuiltin(soundId)
+      return
     }
+
+    if (!customPath) {
+      // 声音 ID 指向一个已经不存在的自定义铃声——直接退回去
+      fallbackToChime()
+      return
+    }
+
+    playCustom(customPath, loop, volume).then(ok => {
+      // 循环播放多半是闹钟，文件读不出来就补一个内置音；单次播放（音乐）保持安静
+      if (!ok && loop) fallbackToChime()
+    })
   }, [playBuiltin, playCustom])
 
   const stopSound = useCallback(() => {
+    playbackGenRef.current++
     if (loopRef.current) { clearInterval(loopRef.current); loopRef.current = null }
     if (audioElRef.current) {
       audioElRef.current.pause()
@@ -192,6 +224,7 @@ export function useAudio() {
 
   /** 预览提示音——内置音用合成，自定义文件用真实播放 */
   const previewSound = useCallback((soundId: string, customPath?: string) => {
+    playbackGenRef.current++
     if (audioCtxRef.current?.state === 'suspended') {
       audioCtxRef.current.resume()
     }

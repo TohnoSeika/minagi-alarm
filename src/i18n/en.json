@@ -88,7 +88,8 @@
       "delete": "Delete Alarm",
       "confirmDelete": "Confirm Delete",
       "title": "New Alarm",
-      "editTitle": "Edit Alarm"
+      "editTitle": "Edit Alarm",
+      "pickWeekday": "Pick at least one day"
     },
     "alert": {
       "dismiss": "Dismiss",
@@ -167,7 +168,7 @@
     },
     "opacity": "Window opacity",
     "wallpaperOpacity": "Desktop Mode opacity",
-    "wallpaperHint": "Drag the slider to preview, release to restore",
+    "wallpaperHint": "Drag in desktop mode to preview live",
     "about": {
       "developed": "Developed by",
       "credit": "im minagi , im everywhere",
@@ -230,5 +231,15 @@
     "dragHint": "Drag to move",
     "frameHint": "Dashed line = window area",
     "keyHint": "Esc Cancel · Enter Confirm"
+  },
+  "dialogs": {
+    "pickAudio": "Choose a Custom Sound",
+    "pickImage": "Choose a Background Image",
+    "exportSticky": "Export Sticky Note",
+    "audioFiles": "Audio Files",
+    "imageFiles": "Image Files"
+  },
+  "errorBoundary": {
+    "message": "😢 Something went wrong — try switching pages."
   }
 }

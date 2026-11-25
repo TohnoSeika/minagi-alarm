@@ -88,7 +88,8 @@
       "delete": "刪除鬧鐘",
       "confirmDelete": "確認刪除",
       "title": "新增鬧鐘",
-      "editTitle": "編輯鬧鐘"
+      "editTitle": "編輯鬧鐘",
+      "pickWeekday": "至少要先選一天喔"
     },
     "alert": {
       "dismiss": "關閉",
@@ -167,7 +168,7 @@
     },
     "opacity": "軟體介面透明度",
     "wallpaperOpacity": "桌面模式透明度",
-    "wallpaperHint": "拖拽滑塊可即時預覽，鬆手後恢復目前介面透明度",
+    "wallpaperHint": "桌面模式下拖曳即可即時預覽",
     "about": {
       "developed": "Developed by",
       "credit": "im minagi , im everywhere",
@@ -230,5 +231,15 @@
     "dragHint": "拖動移動",
     "frameHint": "虛線=介面區域",
     "keyHint": "Esc 取消 · Enter 確認"
+  },
+  "dialogs": {
+    "pickAudio": "選擇自訂提示音",
+    "pickImage": "選擇背景圖片",
+    "exportSticky": "匯出便利貼",
+    "audioFiles": "音訊檔案",
+    "imageFiles": "圖片檔案"
+  },
+  "errorBoundary": {
+    "message": "😢 出了點小問題，切換一下頁面就好了～"
   }
 }

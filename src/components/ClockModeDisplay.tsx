@@ -23,7 +23,6 @@ export default function ClockModeDisplay({ showSeconds, onClockContextMenu }: { 
   const [config, setConfig] = useState<ClockConfig>(DEFAULT_CONFIG)
   const [dragging, setDragging] = useState(false)
   const dragStart = useRef({ x: 0, y: 0, cx: 0, cy: 0 })
-  const containerRef = useRef<HTMLDivElement>(null)
   const configRef = useRef(config)
   configRef.current = config
 
@@ -112,7 +111,6 @@ export default function ClockModeDisplay({ showSeconds, onClockContextMenu }: { 
 
   return (
     <div
-      ref={containerRef}
       style={style}
       onMouseDown={handleMouseDown}
       onWheel={handleWheel}

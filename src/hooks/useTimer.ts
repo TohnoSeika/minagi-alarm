@@ -11,7 +11,6 @@ export interface TimerState {
   remainingSeconds: number
   isRunning: boolean
   isPaused: boolean
-  sound: string
 }
 
 export function useTimer() {
@@ -19,7 +18,6 @@ export function useTimer() {
   const [remainingSeconds, setRemainingSeconds] = useState(300)
   const [isRunning, setIsRunning] = useState(false)
   const [isPaused, setIsPaused] = useState(false)
-  const [sound, setSoundState] = useState('chime')
   const [alertActive, setAlertActive] = useState(false)
   const [reminderText, setReminderText] = useState('')
 
@@ -99,10 +97,6 @@ export function useTimer() {
     reminderRef.current = text
   }, [])
 
-  const setSound = useCallback((s: string) => {
-    setSoundState(s)
-  }, [])
-
   const dismissAlert = useCallback(() => {
     setAlertActive(false)
     notifiedRef.current = false
@@ -113,12 +107,10 @@ export function useTimer() {
     remainingSeconds,
     isRunning,
     isPaused,
-    sound,
     setTime,
     start,
     pause,
     reset,
-    setSound,
     alertActive,
     reminderText,
     setReminderText: setReminder,

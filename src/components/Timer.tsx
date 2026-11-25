@@ -13,14 +13,12 @@ export interface TimerProps {
   remainingSeconds: number
   isRunning: boolean
   isPaused: boolean
-  sound: string
   reminderText: string
   setTime: (h: number, m: number, s: number) => void
   start: () => void
   pause: () => void
   reset: () => void
   setReminderText: (text: string) => void
-  setSound: (sound: string) => void
   alertActive: boolean
   dismissAlert: () => void
 }

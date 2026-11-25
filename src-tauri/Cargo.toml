@@ -1,6 +1,6 @@
 [package]
 name = "minagi-alarm"
-version = "1.6.0"
+version = "1.6.1"
 description = "Minagi Alarm — refined desktop alarm clock"
 authors = ["Tohno Seika"]
 edition = "2021"

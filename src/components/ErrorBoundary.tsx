@@ -4,6 +4,7 @@
  */
 
 import { Component, ReactNode } from 'react'
+import i18n from '../i18n'
 
 interface Props {
   children: ReactNode
@@ -35,7 +36,7 @@ export default class ErrorBoundary extends Component<Props, State> {
           color: 'var(--text-secondary)',
           fontSize: 13,
         }}>
-          😢 出了点小问题，切换一下页面就好了～
+          {i18n.t('errorBoundary.message')}
         </div>
       )
     }
